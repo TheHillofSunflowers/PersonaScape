@@ -1,16 +1,24 @@
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import Navbar from "@/app/navbar/navbar";
 
 export const metadata = {
-  title: "My Profile App",
-  description: "Create your own profile page",
+  title: "Profile Builder",
+  description: "A customizable profile page builder",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Navbar />
+          <main className="container mx-auto p-4">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );
