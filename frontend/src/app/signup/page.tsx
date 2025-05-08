@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export default function Signup() {
@@ -18,7 +18,7 @@ export default function Signup() {
     setSuccess("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      const res = await api.post("/api/auth/signup", {
         username,
         email,
         password,
@@ -29,8 +29,8 @@ export default function Signup() {
         setTimeout(() => router.push("/login"), 2000);
       }
     } catch (err: any) {
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
         setError("Something went wrong. Please try again.");
       }

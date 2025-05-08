@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "prisma": "prisma",
-    "dev": "ts-node-dev src/index.ts",
+    "db:push": "prisma db push",
+    "generate": "prisma generate",
+    "test:prisma": "node testPrisma.js",
+    "dev:simple": "prisma generate && ts-node-dev src/index.ts",
+    "dev": "npm run generate && ts-node-dev src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "ts-node prisma/seed.ts"
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.14",

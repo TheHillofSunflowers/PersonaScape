@@ -1,10 +1,8 @@
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Request, Response, RequestHandler } from 'express';
+import prisma from '../prismaClient';
 
 // GET /profile/:username
-export const getProfile = async (req: Request, res: Response) => {
+export const getProfile: RequestHandler = async (req, res, next) => {
   const { username } = req.params;
   try {
     const user = await prisma.user.findUnique({
@@ -13,27 +11,32 @@ export const getProfile = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'Profile not found' });
+      res.status(404).json({ error: 'Profile not found' });
+      return;
     }
 
-    return res.json(user.profile);
+    res.json(user.profile);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Failed to fetch profile' });
+    next(err);
   }
 };
 
 // PUT /profile/
-export const updateProfile = async (req: Request, res: Response) => {
-  const userId = req.userId;  // assuming `userId` is set by your auth middleware
+export const updateProfile: RequestHandler = async (req, res, next) => {
+  const userId = req.userId;
   const { bio, hobbies, socialLinks, customHtml, theme } = req.body;
+
+  if (!userId) {
+    res.status(401).json({ error: 'Not authenticated' });
+    return;
+  }
 
   try {
     const profile = await prisma.profile.upsert({
-      where: { userId },
+      where: { userId: parseInt(userId) },
       update: { bio, hobbies, socialLinks, customHtml, theme },
       create: {
-        userId,
+        userId: parseInt(userId),
         bio,
         hobbies,
         socialLinks,
@@ -42,9 +45,8 @@ export const updateProfile = async (req: Request, res: Response) => {
       },
     });
 
-    return res.json(profile);
+    res.json(profile);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Failed to update profile' });
+    next(err);
   }
 };

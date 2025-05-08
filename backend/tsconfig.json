@@ -3,14 +3,17 @@
       "target": "ES6",
       "module": "commonjs",
       "outDir": "dist",
-      "rootDir": "src",
       "strict": true,
       "moduleResolution": "node",
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
       "skipLibCheck": true,
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "baseUrl": ".",
+      "paths": {
+        "@prisma/client": ["./generated/prisma"]
+      }
     },
-    "include": ["src/**/*", "prisma/**/*"],
+    "include": ["src/**/*", "prisma/**/*", "generated/**/*"],
     "exclude": ["node_modules"]
   }

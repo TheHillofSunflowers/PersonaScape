@@ -1,42 +1,65 @@
+// Load environment check first
+import './checkEnv';
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
 
-dotenv.config();
+// Import Prisma client
+import prisma from './prismaClient';
+
+// Initialize Prisma client
+async function initPrisma() {
+  try {
+    console.log('Attempting to connect to the database...');
+    await prisma.$connect();
+    console.log('Prisma client connected to database successfully');
+    
+    // Test query to ensure connection works
+    const userCount = await prisma.user.count();
+    console.log(`Database has ${userCount} users`);
+  } catch (error) {
+    console.error('Failed to initialize Prisma client:', error);
+    process.exit(1);
+  }
+}
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000', // Frontend dev server
+// CORS configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-app.options('*', cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-}));
+// Apply CORS middleware first
+app.use(cors(corsOptions));
 
+// Then apply other middleware
 app.use(express.json());
 
 app.get('/', (_req, res) => {
   res.send('Profile Builder API is running 🚀');
 });
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-});
-
 app.use('/api/auth', authRoutes);
 app.use('/profile', profileRoutes);
 
+// Error handler middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Start the server after initializing Prisma
+initPrisma().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}).catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
