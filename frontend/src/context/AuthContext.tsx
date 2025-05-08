@@ -38,12 +38,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async (token: string) => {
     try {
-      const res = await api.get("/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
+      // Use direct fetch with the correct API endpoint
+      const response = await fetch('http://localhost:5000/api/auth/me', {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
-      setUser(res.data.user);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      } else {
+        console.error("Failed to fetch user, status:", response.status);
+        logout();
+      }
     } catch (err) {
-      console.error("Failed to fetch user");
+      console.error("Failed to fetch user:", err);
       logout();
     }
   };

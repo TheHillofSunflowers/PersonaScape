@@ -15,12 +15,45 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    
+    const loginUrl = 'http://localhost:5000/api/auth/login';
+    const loginData = { email, password };
+    
     try {
-        const res = await api.post("/auth/login", { email, password });
-        login(res.data.token); // Store token + fetch user info
-        router.push("/dashboard"); // Or your protected page
+      console.log("Attempting direct fetch login...");
+      
+      try {
+        // First try with direct fetch
+        const response = await fetch(loginUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(loginData)
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Login successful:", data);
+          login(data.token); // Store token + fetch user info
+          router.push("/dashboard"); // Or your protected page
+          return;
+        } else {
+          console.warn("Login failed with status:", response.status);
+          throw new Error(response.status === 401 ? "Invalid email or password" : `Login failed with status: ${response.status}`);
+        }
+      } catch (fetchErr) {
+        console.warn("Direct fetch login failed:", fetchErr);
+        // Fall back to axios as a backup
+        console.log("Falling back to axios...");
+        const res = await api.post("/api/auth/login", loginData);
+        login(res.data.token);
+        router.push("/dashboard");
+      }
     } catch (err: any) {
-        setError(err.response?.data?.message || "Login failed");
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
@@ -53,7 +86,7 @@ export default function LoginPage() {
         </button>
 
         <p className="text-sm mt-4 text-center">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a href="/signup" className="text-blue-500 hover:underline">
                 Sign up
             </a>
