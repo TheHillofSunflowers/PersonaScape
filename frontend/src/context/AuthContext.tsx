@@ -30,7 +30,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load token from localStorage on first render
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    console.log("AuthProvider init - checking localStorage token:", storedToken ? "Token found" : "No token");
+    
     if (storedToken) {
+      console.log("Token found in localStorage, setting token state and fetching user");
       setToken(storedToken);
       fetchUser(storedToken);
     }
@@ -38,6 +41,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async (token: string) => {
     try {
+      console.log("Fetching user with token:", token.substring(0, 10) + "...");
+      
       // Use direct fetch with the correct API endpoint
       const response = await fetch('http://localhost:5000/api/auth/me', {
         headers: { 
@@ -48,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (response.ok) {
         const data = await response.json();
+        console.log("User data fetched successfully:", data);
         setUser(data.user);
       } else {
         console.error("Failed to fetch user, status:", response.status);
@@ -60,12 +66,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = (newToken: string) => {
+    console.log("Login called with new token:", newToken.substring(0, 10) + "...");
     localStorage.setItem("token", newToken);
     setToken(newToken);
     fetchUser(newToken);
   };
 
   const logout = () => {
+    console.log("Logout called, clearing token and user");
     localStorage.removeItem("token");
     setUser(null);
     setToken(null);

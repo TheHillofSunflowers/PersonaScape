@@ -3,6 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../prismaClient";
 
+// Define a custom type for requests with userId
+interface AuthRequest extends Request {
+  userId?: string;
+}
+
 // Signup handler
 export const signup: RequestHandler = async (req, res) => {
   const { username, email, password } = req.body;
@@ -76,7 +81,7 @@ export const login: RequestHandler = async (req, res) => {
 };
 
 // Get current user (auth/me)
-export const getMe: RequestHandler = async (req, res) => {
+export const getMe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
 

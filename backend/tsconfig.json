@@ -12,8 +12,9 @@
       "baseUrl": ".",
       "paths": {
         "@prisma/client": ["./generated/prisma"]
-      }
+      },
+      "typeRoots": ["./node_modules/@types", "./types"]
     },
-    "include": ["src/**/*", "prisma/**/*", "generated/**/*"],
+    "include": ["src/**/*", "prisma/**/*", "generated/**/*", "types/**/*"],
     "exclude": ["node_modules"]
   }

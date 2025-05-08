@@ -32,10 +32,11 @@ const app = express();
 
 // More permissive CORS configuration for development
 const corsOptions = {
-  origin: '*', // Allow all origins in development
-  credentials: true, // Enable credentials for proper auth
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'], // Allow frontend domains explicitly
+  credentials: true, // Enable credentials for auth
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma'],
+  exposedHeaders: ['Content-Length', 'X-Request-Id'],
   preflightContinue: false,
   optionsSuccessStatus: 204,
   maxAge: 86400 // Cache preflight request for 24 hours
@@ -47,28 +48,8 @@ app.use(requestLogger);
 // Apply CORS middleware first
 app.use(cors(corsOptions));
 
-// Handle OPTIONS requests explicitly - using a path pattern that express can handle
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    // Return success for all OPTIONS requests
-    res.status(204).end();
-    return;
-  }
-  next();
-});
-
 // Parse JSON request body
 app.use(express.json());
-
-// Add CORS headers to all responses
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
-  next();
-});
 
 // Serve static files from the public directory
 const publicPath = path.join(__dirname, '../public');
@@ -85,6 +66,38 @@ app.get('/api/test-cors', (req, res) => {
     message: 'CORS is working!',
     headers: req.headers,
     timestamp: new Date().toISOString()
+  });
+});
+
+// Debug endpoint for JWT verification
+app.get('/api/debug-jwt', (req, res) => {
+  const jwt = require('jsonwebtoken');
+  
+  // Create a test token with the current secret
+  const testToken = jwt.sign(
+    { test: 'data', timestamp: new Date().toISOString() },
+    process.env.JWT_SECRET!,
+    { expiresIn: '1h' }
+  );
+  
+  // Verify we can decode it (sanity check that JWT_SECRET is consistent)
+  let verifiedToken;
+  let error = null;
+  
+  try {
+    verifiedToken = jwt.verify(testToken, process.env.JWT_SECRET!);
+  } catch (err) {
+    error = err instanceof Error ? err.message : 'Unknown error';
+  }
+  
+  res.json({
+    message: 'JWT debug information',
+    secretAvailable: !!process.env.JWT_SECRET,
+    secretFirstChars: process.env.JWT_SECRET ? process.env.JWT_SECRET.substring(0, 4) + '...' : null,
+    secretLength: process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0,
+    testTokenCreated: !!testToken,
+    testTokenVerified: !!verifiedToken,
+    error,
   });
 });
 
@@ -123,7 +136,7 @@ app.get('/api/url-info', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
-app.use('/profile', profileRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Add 404 handler for API routes with a simple pattern
 app.use('/api', (req, res) => {
