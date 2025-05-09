@@ -3,8 +3,16 @@
 import { useState } from "react";
 import api from "@/lib/api";
 
+interface TestResult {
+  message?: string;
+  data?: unknown;
+  success?: boolean;
+  status?: number;
+  statusText?: string;
+}
+
 export default function TestConnectionPage() {
-  const [testResult, setTestResult] = useState<any>(null);
+  const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [customUrl, setCustomUrl] = useState('');

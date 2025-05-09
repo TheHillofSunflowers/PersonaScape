@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams, notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import LikeButton from '@/components/LikeButton';
 
 // Profile type definition
@@ -83,7 +83,7 @@ export default function PublicProfilePage() {
             if (errorData && errorData.error) {
               errorMsg = errorData.error;
             }
-          } catch (e) {
+          } catch (_) {
             // If we can't parse the response, just use the default error message
           }
           setError(errorMsg);
@@ -181,7 +181,7 @@ export default function PublicProfilePage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-blue-50 p-8 rounded-lg shadow-md max-w-md w-full">
           <h1 className="text-2xl font-bold text-blue-700 mb-4">Profile Not Set Up Yet</h1>
-          <p className="text-gray-800">The profile for <span className="font-semibold">{username}</span> exists but hasn't been customized yet.</p>
+          <p className="text-gray-800">The profile for <span className="font-semibold">{username}</span> exists but hasn&apos;t been customized yet.</p>
           <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/" className="text-blue-600 hover:underline text-center">
               Go to Home

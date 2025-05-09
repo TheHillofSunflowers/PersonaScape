@@ -38,7 +38,7 @@ export default function Home() {
           <h1 className="text-5xl font-bold text-blue-900 mb-6">PersonaScape</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Create your customizable, shareable profile page and express yourself online.
-            Build a beautiful digital presence that's uniquely you!
+            Build a beautiful digital presence that&apos;s uniquely you!
           </p>
           
           {user ? (

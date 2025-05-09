@@ -93,7 +93,7 @@ export default function EditProfilePage() {
               customHtml: response.data.customHtml || ''
             });
           }
-        } catch (err) {
+        } catch (_) {
           // If profile doesn't exist yet, we'll just use the default empty profile
           setIsNewProfile(true); // This is a new profile
           console.log('Creating new profile as none exists yet');
@@ -147,19 +147,22 @@ export default function EditProfilePage() {
             router.push(`/p/${user.username}`);
           }
         }, 1500);
-      } catch (apiError: any) {
+      } catch (apiError: unknown) {
         console.error('API Error details:', apiError);
-        if (apiError.message === 'Network Error') {
+        if (apiError instanceof Error && apiError.message === 'Network Error') {
           setError('Network error. This could be caused by CORS or server connectivity issues. Please try again.');
-        } else if (apiError.response) {
-          setError(`Error: ${apiError.response.status} - ${apiError.response.data?.error || 'Unknown error'}`);
-        } else {
+        } else if (apiError && typeof apiError === 'object' && 'response' in apiError && apiError.response) {
+          const errorResponse = apiError.response as {status: number, data?: {error?: string}};
+          setError(`Error: ${errorResponse.status} - ${errorResponse.data?.error || 'Unknown error'}`);
+        } else if (apiError instanceof Error) {
           setError(`Failed to save profile: ${apiError.message}`);
+        } else {
+          setError('An unknown error occurred');
         }
       }
       
-    } catch (err) {
-      console.error('Error in form submission:', err);
+    } catch (_) {
+      console.error('Error in form submission:');
       setError('Failed to process form data. Please try again.');
     } finally {
       setIsSaving(false);

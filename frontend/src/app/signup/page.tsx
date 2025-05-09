@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -66,15 +65,20 @@ export default function Signup() {
         setSuccess("Signup successful! Redirecting to login...");
         setTimeout(() => router.push("/login"), 2000);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Full error object:", err);
       
-      if (err.name === 'AxiosError' && err.message === 'Network Error') {
+      if (err && 
+          typeof err === 'object' && 
+          'name' in err && 
+          err.name === 'AxiosError' && 
+          'message' in err && 
+          err.message === 'Network Error') {
         setError(`Network error: Cannot connect to the server. Please check if the backend is running at ${signupUrl}. Try the /test-connection page for diagnostics.`);
         console.error("Network error details:", {
-          message: err.message,
-          code: err.code,
-          stack: err.stack
+          message: (err as {message: string}).message,
+          code: 'code' in err ? err.code : undefined,
+          stack: 'stack' in err ? err.stack : undefined
         });
         
         // Try to run a quick diagnostic
@@ -82,10 +86,20 @@ export default function Signup() {
           .then(res => res.json())
           .then(data => console.log("Diagnostic test successful:", data))
           .catch(diagErr => console.error("Diagnostic test failed:", diagErr));
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
+      } else if (err && 
+                typeof err === 'object' && 
+                'response' in err && 
+                err.response && 
+                typeof err.response === 'object' && 
+                'data' in err.response && 
+                err.response.data && 
+                typeof err.response.data === 'object' && 
+                'message' in err.response.data) {
+        setError(err.response.data.message as string);
+      } else if (err instanceof Error) {
         setError(`Something went wrong: ${err.message}. Please check the console for details.`);
+      } else {
+        setError('An unknown error occurred');
       }
     }
   };
