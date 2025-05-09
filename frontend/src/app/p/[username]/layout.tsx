@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-type GenerateMetadataProps = {
-  params: { username: string }
-}
-
 // Generate metadata dynamically based on the username
-export async function generateMetadata({ params }: GenerateMetadataProps): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { username: string }
+}): Promise<Metadata> {
   const username = params.username;
   
   // You could fetch profile data here to get more details
@@ -21,16 +21,11 @@ export async function generateMetadata({ params }: GenerateMetadataProps): Promi
   }
 }
 
-type LayoutProps = {
-  children: React.ReactNode;
-  params: { username: string };
-}
-
-export default function ProfileLayout({ 
+export default function ProfileLayout({
   children,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  params 
-}: LayoutProps) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <>
       {children}
