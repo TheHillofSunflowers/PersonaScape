@@ -1,45 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import prisma from '../prismaClient';
-
-// Interface for authenticated request with userId
-interface AuthRequest extends Request {
-  userId?: string;
-}
-
-// Define custom interfaces to match Prisma models
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface Profile {
-  id: number;
-  userId: number;
-  bio?: string | null;
-  hobbies?: string | null;
-  socialLinks?: any;
-  customHtml?: string | null;
-  theme?: string | null;
-  likesCount: number;
-  User?: User;
-}
-
-// Define ProfileLike type since Prisma hasn't generated it yet
-interface ProfileLike {
-  id: number;
-  profileId: number;
-  userId: number;
-  createdAt: Date;
-  profile?: Profile;
-}
+const prisma = require('../prismaClient');
 
 /**
  * Like a profile
  * POST /api/likes/profile/:profileId
  */
-export const likeProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+const likeProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
@@ -111,7 +76,7 @@ export const likeProfile = async (req: AuthRequest, res: Response, next: NextFun
  * Unlike a profile
  * DELETE /api/likes/profile/:profileId
  */
-export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+const unlikeProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
@@ -183,7 +148,7 @@ export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextF
  * Check if user has liked a profile
  * GET /api/likes/check/:profileId
  */
-export const checkLikeStatus = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+const checkLikeStatus = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
@@ -225,7 +190,7 @@ export const checkLikeStatus = async (req: AuthRequest, res: Response, next: Nex
  * Get profiles liked by the user
  * GET /api/likes/user
  */
-export const getLikedProfiles = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+const getLikedProfiles = async (req, res, next) => {
   try {
     const userId = req.userId;
 
@@ -281,7 +246,7 @@ export const getLikedProfiles = async (req: AuthRequest, res: Response, next: Ne
  * Get leaderboard of most liked profiles
  * GET /api/likes/leaderboard
  */
-export const getLeaderboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getLeaderboard = async (req, res, next) => {
   try {
     // Get the top profiles by likes count
     const topProfiles = await prisma.profile.findMany({
@@ -319,4 +284,12 @@ export const getLeaderboard = async (req: Request, res: Response, next: NextFunc
     console.error('Error in getLeaderboard:', err);
     next(err);
   }
+};
+
+module.exports = {
+  likeProfile,
+  unlikeProfile,
+  checkLikeStatus,
+  getLikedProfiles,
+  getLeaderboard
 }; 

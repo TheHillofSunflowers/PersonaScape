@@ -11,9 +11,11 @@
       "resolveJsonModule": true,
       "baseUrl": ".",
       "lib": ["ES2018", "DOM"],
-      "typeRoots": ["./node_modules/@types"],
-      "types": []
+      "typeRoots": ["./node_modules/@types", "./types"],
+      "types": ["node"],
+      "allowSyntheticDefaultImports": true,
+      "noImplicitAny": false
     },
-    "include": ["src/**/*", "prisma/**/*"],
+    "include": ["src/**/*", "prisma/**/*", "global.d.ts", "types/**/*"],
     "exclude": ["node_modules"]
   }

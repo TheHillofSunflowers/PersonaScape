@@ -1,19 +1,23 @@
 // Load environment check first
-import './checkEnv';
+require('./checkEnv');
 
-// Fix Express imports 
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import path from 'path';
-import authRoutes from './routes/authRoutes';
-import profileRoutes from './routes/profileRoutes';
-import likesRoutes from './routes/likesRoutes';
-import publicRoutes from './routes/publicRoutes';
-import { requestLogger } from './middleware/debugMiddleware';
-import os from 'os';
+// Express imports 
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const os = require('os');
+
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const likesRoutes = require('./routes/likesRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+
+// Import middleware
+const { requestLogger } = require('./middleware/debugMiddleware');
 
 // Import Prisma client
-import prisma from './prismaClient';
+const prisma = require('./prismaClient');
 
 // Initialize Prisma client
 async function initPrisma() {
@@ -33,7 +37,7 @@ async function initPrisma() {
 
 const app = express();
 
-// More permissive CORS configuration for development
+// More permissive CORS configuration for deployment
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://personascape.vercel.app'], // Allow frontend domains explicitly
   credentials: true, // Enable credentials for auth
@@ -144,7 +148,7 @@ app.use('/api/likes', likesRoutes);
 app.use('/api/public', publicRoutes);
 
 // Add 404 handler for API routes with a simple pattern
-app.use('/api', (req: Request, res: Response) => {
+app.use('/api', (req, res) => {
   // Only handle routes that haven't been matched yet
   res.status(404).json({
     error: 'Not Found',
@@ -154,7 +158,7 @@ app.use('/api', (req: Request, res: Response) => {
 });
 
 // Fallback for all other routes
-app.use((req: Request, res: Response) => {
+app.use((req, res) => {
   res.status(404).send(`
     <html>
       <head>
@@ -175,7 +179,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler middleware
-app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -183,9 +187,9 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 // Get available network interfaces
 function getNetworkIPs() {
   const nets = os.networkInterfaces();
-  const results: Array<{name: string, address: string}> = [];
+  const results = [];
 
-  // Handle network interfaces safer
+  // Handle network interfaces safely
   if (nets) {
     for (const name of Object.keys(nets)) {
       const interfaces = nets[name];
@@ -227,7 +231,7 @@ initPrisma().then(() => {
   });
   
   // Handle server errors
-  server.on('error', (error: NodeJS.ErrnoException) => {
+  server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
       console.error(`⚠️ Port ${PORT} is already in use. Try a different port.`);
     } else {
@@ -238,4 +242,4 @@ initPrisma().then(() => {
 }).catch(error => {
   console.error('Failed to start server:', error);
   process.exit(1);
-});
+}); 

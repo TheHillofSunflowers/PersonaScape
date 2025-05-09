@@ -1,12 +1,12 @@
-import express from 'express';
-import { authenticateToken } from '../middleware/authMiddleware';
-import { 
+const express = require('express');
+const { authenticateToken } = require('../middleware/authMiddleware');
+const { 
   likeProfile, 
   unlikeProfile, 
   checkLikeStatus, 
   getLikedProfiles, 
   getLeaderboard 
-} from '../controllers/likesController';
+} = require('../controllers/likesController');
 
 const router = express.Router();
 
@@ -27,4 +27,4 @@ router.get('/check/:profileId', checkLikeStatus);
 // Get profiles liked by the user
 router.get('/user', getLikedProfiles);
 
-export default router; 
+module.exports = router; 

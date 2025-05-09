@@ -2,20 +2,19 @@
 # exit on error
 set -e
 
-# Make sure production flag is off and install all dependencies
+# Configure NPM for development environment
 echo "production=false" > .npmrc
+
+# Install all dependencies
 npm install
 
-# Explicitly install @types/node
-npm install --no-save @types/node
+# Explicitly install all required type packages
+npm install --no-save @types/node @types/express @types/cors @types/bcryptjs @types/jsonwebtoken
 
 # Generate Prisma client
 npx prisma generate
 
-# Build the project with specific options for @types/node
-npx tsc --typeRoots ./node_modules/@types --noEmit false
-
-# Standard build
+# Build the project
 npm run build
 
 echo "Build completed successfully!" 

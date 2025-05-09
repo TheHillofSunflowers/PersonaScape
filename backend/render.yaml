@@ -1,9 +1,9 @@
 services:
   - type: web
     name: personascape-api
-    env: node
-    buildCommand: ./build.sh
-    startCommand: npm start
+    runtime: node
+    buildCommand: ./deploy.sh
+    startCommand: npm run deploy:js
     healthCheckPath: /api/test-cors
     envVars:
       - key: NODE_ENV
