@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
+import LikeButton from '@/components/LikeButton';
 
 // Profile type definition
 type ProfileData = {
@@ -70,7 +71,10 @@ export default function PublicProfilePage() {
             customHtml: data.customHtml || ''
           });
         } else if (response.status === 404) {
-          setError(`Profile for user "${username}" not found.`);
+          // Use Next.js built-in not found page
+          console.error(`Profile for user "${username}" not found.`);
+          setProfile(null);
+          // We'll handle the not found state in the render section
         } else {
           // Try to get error message from response
           let errorMsg = `Failed to fetch profile: ${response.status}`;
@@ -86,7 +90,17 @@ export default function PublicProfilePage() {
         }
       } catch (err) {
         console.error('Error fetching profile:', err);
-        setError(`Failed to load profile. ${(err as Error).message}`);
+        const errorMessage = (err as Error).message || '';
+        
+        // Check if this is a "data is null" error, which means the profile hasn't been created yet
+        if (errorMessage.includes('data is null') || errorMessage.includes('null')) {
+          // This is likely a case where the user exists but hasn't created a profile yet
+          // We'll handle it like a not found case
+          setProfile(null);
+        } else {
+          // For other errors, show the error message
+          setError(`Failed to load profile. ${errorMessage}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -161,14 +175,20 @@ export default function PublicProfilePage() {
     );
   }
   
-  if (!profile) {
+  // Show not found page if profile is null and we're not loading
+  if (!profile && !loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-50 p-8 rounded-lg shadow-md max-w-md w-full">
-          <h1 className="text-2xl font-bold text-yellow-700 mb-4">Profile Not Found</h1>
-          <p className="text-gray-800">The profile you're looking for doesn't exist or hasn't been created yet.</p>
-          <div className="mt-6">
-            <Link href="/" className="text-blue-600 hover:underline">Go to Home</Link>
+        <div className="bg-blue-50 p-8 rounded-lg shadow-md max-w-md w-full">
+          <h1 className="text-2xl font-bold text-blue-700 mb-4">Profile Not Set Up Yet</h1>
+          <p className="text-gray-800">The profile for <span className="font-semibold">{username}</span> exists but hasn't been customized yet.</p>
+          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/" className="text-blue-600 hover:underline text-center">
+              Go to Home
+            </Link>
+            <Link href="/profile/edit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center">
+              Set Up My Profile
+            </Link>
           </div>
         </div>
       </div>
@@ -184,17 +204,39 @@ export default function PublicProfilePage() {
       }}
     >
       {/* Custom HTML (if provided) */}
-      {profile.customHtml && (
+      {profile?.customHtml && (
         <div
           className="custom-html-container"
           dangerouslySetInnerHTML={{ __html: profile.customHtml }}
         />
       )}
       
-      <div className="container mx-auto px-4 pt-10">
-        <header className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-2">{username}'s PersonaScape</h1>
-        </header>
+      <div className="container mx-auto px-4 py-8">
+        <div 
+          className="rounded-lg shadow-lg p-6 mb-8"
+          style={{ background: themeStyles.cardBg }}
+        >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <h1 className="text-3xl font-bold mb-4 sm:mb-0">{username}</h1>
+            
+            {/* Add the like button here */}
+            {profile?.id && (
+              <div className="flex items-center">
+                <LikeButton 
+                  profileId={profile.id} 
+                  size="lg" 
+                  showCount={true}
+                  className="ml-auto" 
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Rest of profile header */}
+          {profile?.bio && (
+            <p className="text-lg mb-6">{profile.bio}</p>
+          )}
+        </div>
         
         <div className="max-w-4xl mx-auto">
           {/* Bio Section */}
@@ -204,8 +246,8 @@ export default function PublicProfilePage() {
           >
             <h2 className="text-2xl font-semibold mb-4">About Me</h2>
             <div className="prose">
-              {profile.bio ? (
-                <p className="whitespace-pre-wrap">{profile.bio}</p>
+              {profile?.bio ? (
+                <p className="whitespace-pre-wrap">{profile?.bio}</p>
               ) : (
                 <p className="text-gray-500 italic">No bio provided</p>
               )}
@@ -218,9 +260,9 @@ export default function PublicProfilePage() {
             style={{ background: themeStyles.cardBg }}
           >
             <h2 className="text-2xl font-semibold mb-4">Interests & Hobbies</h2>
-            {profile.hobbies.length > 0 ? (
+            {profile?.hobbies && profile.hobbies.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {profile.hobbies.map((hobby, index) => (
+                {profile?.hobbies.map((hobby, index) => (
                   <span 
                     key={index} 
                     className="px-3 py-1 rounded-full text-sm font-medium"
@@ -243,7 +285,7 @@ export default function PublicProfilePage() {
             style={{ background: themeStyles.cardBg }}
           >
             <h2 className="text-2xl font-semibold mb-4">Connect with Me</h2>
-            {profile.socialLinks.length > 0 ? (
+            {profile?.socialLinks && profile.socialLinks.length > 0 ? (
               <ul className="space-y-3">
                 {profile.socialLinks.map((link, index) => (
                   <li key={index}>

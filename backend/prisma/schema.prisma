@@ -20,6 +20,7 @@ model User {
   email     String   @unique
   password  String
   profile   Profile?
+  likes     ProfileLike[]
 }
 
 model Profile {
@@ -31,4 +32,20 @@ model Profile {
   customHtml   String?
   theme        String? // light/dark/custom
   User         User    @relation(fields: [userId], references: [id])
+  receivedLikes ProfileLike[]
+  likesCount    Int    @default(0)
+}
+
+model ProfileLike {
+  id         Int      @id @default(autoincrement())
+  profileId  Int      // The profile that was liked
+  userId     Int      // The user who liked the profile
+  createdAt  DateTime @default(now()) // When the like was created
+  
+  // Define relations
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  
+  // Ensure a user can only like a profile once
+  @@unique([profileId, userId])
 }

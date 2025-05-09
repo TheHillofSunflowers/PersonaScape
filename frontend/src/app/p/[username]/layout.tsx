@@ -8,7 +8,9 @@ type Props = {
 
 // Generate metadata dynamically based on the username
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const username = params.username;
+  // Make sure params is treated as a promise and awaited
+  const resolvedParams = await Promise.resolve(params);
+  const username = resolvedParams.username;
   
   // You could fetch profile data here to get more details
   // but for simplicity we'll just use the username

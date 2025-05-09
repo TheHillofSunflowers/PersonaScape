@@ -4,6 +4,34 @@ import axios, { AxiosInstance } from 'axios';
 const baseURL = 'http://localhost:5000';
 console.log('API client initialized with base URL:', baseURL);
 
+// Helper function to get auth token from cookies
+const getCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null; // Check if running in browser
+  
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+};
+
+// Get auth token from either cookie or localStorage
+const getAuthToken = (): string | null => {
+  // Try cookie first (more secure)
+  const cookieToken = getCookie('auth_token');
+  if (cookieToken) return cookieToken;
+  
+  // Fall back to localStorage
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem('token');
+  }
+  
+  return null;
+};
+
 // Add debugging for network issues
 const debugNetworkIssues = async () => {
   try {
@@ -44,7 +72,7 @@ const api = axios.create({
 
 // Add request interceptor to add auth token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

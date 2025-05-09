@@ -6,6 +6,8 @@ import cors from 'cors';
 import path from 'path';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
+import likesRoutes from './routes/likesRoutes';
+import publicRoutes from './routes/publicRoutes';
 import { requestLogger } from './middleware/debugMiddleware';
 import { networkInterfaces } from 'os';
 
@@ -137,6 +139,8 @@ app.get('/api/url-info', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/likes', likesRoutes);
+app.use('/api/public', publicRoutes);
 
 // Add 404 handler for API routes with a simple pattern
 app.use('/api', (req, res) => {

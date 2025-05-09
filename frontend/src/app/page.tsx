@@ -91,10 +91,13 @@ export default function Home() {
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-blue-800 mb-4">Advanced Options</h2>
+            <h2 className="text-xl font-bold text-blue-800 mb-4">Profile Likes</h2>
             <p className="text-gray-600">
-              Add custom HTML for unlimited creativity and make your profile truly unique.
+              Like profiles you enjoy and see your profile climb the ranks on our leaderboard as others appreciate your content.
             </p>
+            <Link href="/leaderboard" className="text-blue-600 hover:underline text-sm block mt-2">
+              See the leaderboard →
+            </Link>
           </div>
         </div>
         
