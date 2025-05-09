@@ -1,7 +1,7 @@
 // Load environment check first
 import './checkEnv';
 
-import express from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
 import authRoutes from './routes/authRoutes';
@@ -9,7 +9,7 @@ import profileRoutes from './routes/profileRoutes';
 import likesRoutes from './routes/likesRoutes';
 import publicRoutes from './routes/publicRoutes';
 import { requestLogger } from './middleware/debugMiddleware';
-import { networkInterfaces } from 'os';
+import os from 'os';
 
 // Import Prisma client
 import prisma from './prismaClient';
@@ -181,7 +181,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 // Get available network interfaces
 function getNetworkIPs() {
-  const nets = networkInterfaces();
+  const nets = os.networkInterfaces();
   const results = [];
 
   for (const name of Object.keys(nets)) {
