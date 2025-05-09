@@ -1,5 +1,5 @@
-// Import directly from the generated location using require for maximum compatibility
-import { PrismaClient } from '../generated/prisma';
+// Import directly from the actual @prisma/client package
+import { PrismaClient } from '@prisma/client';
 
 // Create a simple client instance
 const prisma = new PrismaClient();

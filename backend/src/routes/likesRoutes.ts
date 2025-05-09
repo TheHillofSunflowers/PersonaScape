@@ -1,4 +1,4 @@
-import { Router, RequestHandler } from 'express';
+import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { 
   likeProfile, 
@@ -10,20 +10,21 @@ import {
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticateToken as RequestHandler);
+// Configure routes - public and authenticated endpoints
+// Public route - doesn't need authentication
+router.get('/leaderboard', getLeaderboard);
+
+// Routes that require authentication
+router.use(authenticateToken);
 
 // Like/unlike a profile
-router.post('/profile/:profileId', likeProfile as RequestHandler);
-router.delete('/profile/:profileId', unlikeProfile as RequestHandler);
+router.post('/profile/:profileId', likeProfile);
+router.delete('/profile/:profileId', unlikeProfile);
 
 // Check if user has liked a profile
-router.get('/check/:profileId', checkLikeStatus as RequestHandler);
+router.get('/check/:profileId', checkLikeStatus);
 
 // Get profiles liked by the user
-router.get('/user', getLikedProfiles as RequestHandler);
-
-// Get most liked profiles (leaderboard)
-router.get('/leaderboard', getLeaderboard as RequestHandler);
+router.get('/user', getLikedProfiles);
 
 export default router; 

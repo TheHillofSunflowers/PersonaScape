@@ -1,15 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prismaClient';
-import { Profile, User, Prisma } from '@prisma/client';
 
 // Interface for authenticated request with userId
 interface AuthRequest extends Request {
   userId?: string;
 }
 
-// Define types for profile with user data
-interface ProfileWithUser extends Profile {
-  User: User;
+// Define custom interfaces to match Prisma models
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface Profile {
+  id: number;
+  userId: number;
+  bio?: string | null;
+  hobbies?: string | null;
+  socialLinks?: any;
+  customHtml?: string | null;
+  theme?: string | null;
+  likesCount: number;
+  User?: User;
 }
 
 // Define ProfileLike type since Prisma hasn't generated it yet
@@ -18,20 +32,21 @@ interface ProfileLike {
   profileId: number;
   userId: number;
   createdAt: Date;
-  profile: ProfileWithUser;
+  profile?: Profile;
 }
 
 /**
  * Like a profile
  * POST /api/likes/profile/:profileId
  */
-export const likeProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const likeProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const userIdNum = parseInt(userId);
@@ -43,12 +58,14 @@ export const likeProfile = async (req: AuthRequest, res: Response, next: NextFun
     });
 
     if (!profile) {
-      return res.status(404).json({ error: 'Profile not found' });
+      res.status(404).json({ error: 'Profile not found' });
+      return;
     }
 
     // Check if user is trying to like their own profile
     if (profile.userId === userIdNum) {
-      return res.status(400).json({ error: 'Cannot like your own profile' });
+      res.status(400).json({ error: 'Cannot like your own profile' });
+      return;
     }
 
     // Check if the user and profile exist with a manual query to avoid schema issues
@@ -58,7 +75,8 @@ export const likeProfile = async (req: AuthRequest, res: Response, next: NextFun
     `;
 
     if (Array.isArray(existingLike) && existingLike.length > 0) {
-      return res.status(400).json({ error: 'Profile already liked' });
+      res.status(400).json({ error: 'Profile already liked' });
+      return;
     }
 
     // Create like with a manual query
@@ -93,13 +111,14 @@ export const likeProfile = async (req: AuthRequest, res: Response, next: NextFun
  * Unlike a profile
  * DELETE /api/likes/profile/:profileId
  */
-export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const userIdNum = parseInt(userId);
@@ -111,7 +130,8 @@ export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextF
     });
 
     if (!profile) {
-      return res.status(404).json({ error: 'Profile not found' });
+      res.status(404).json({ error: 'Profile not found' });
+      return;
     }
 
     // Check if the like exists with a raw query
@@ -121,7 +141,8 @@ export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextF
     `;
 
     if (!(Array.isArray(existingLike) && existingLike.length > 0)) {
-      return res.status(400).json({ error: 'Profile not liked yet' });
+      res.status(400).json({ error: 'Profile not liked yet' });
+      return;
     }
 
     // Delete the like with a raw query
@@ -156,13 +177,14 @@ export const unlikeProfile = async (req: AuthRequest, res: Response, next: NextF
  * Check if user has liked a profile
  * GET /api/likes/check/:profileId
  */
-export const checkLikeStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const checkLikeStatus = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.userId;
     const { profileId } = req.params;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const userIdNum = parseInt(userId);
@@ -193,12 +215,13 @@ export const checkLikeStatus = async (req: AuthRequest, res: Response, next: Nex
  * Get profiles liked by the user
  * GET /api/likes/user
  */
-export const getLikedProfiles = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getLikedProfiles = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const userIdNum = parseInt(userId);
@@ -243,7 +266,7 @@ export const getLikedProfiles = async (req: AuthRequest, res: Response, next: Ne
  * Get most liked profiles (leaderboard)
  * GET /api/likes/leaderboard
  */
-export const getLeaderboard = async (req: Request, res: Response, next: NextFunction) => {
+export const getLeaderboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Get limit from query params or use default
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;

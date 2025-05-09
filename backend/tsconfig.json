@@ -1,20 +1,18 @@
 {
     "compilerOptions": {
-      "target": "ES6",
+      "target": "ES2018",
       "module": "commonjs",
       "outDir": "dist",
-      "strict": true,
+      "strict": false,
       "moduleResolution": "node",
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
       "skipLibCheck": true,
       "resolveJsonModule": true,
       "baseUrl": ".",
-      "paths": {
-        "@prisma/client": ["./generated/prisma"]
-      },
+      "lib": ["ES2018"],
       "typeRoots": ["./node_modules/@types", "./types"]
     },
-    "include": ["src/**/*", "prisma/**/*", "generated/**/*", "types/**/*"],
+    "include": ["src/**/*", "prisma/**/*"],
     "exclude": ["node_modules"]
   }
