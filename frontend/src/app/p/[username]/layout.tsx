@@ -28,6 +28,7 @@ type LayoutProps = {
 
 export default function ProfileLayout({ 
   children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   params 
 }: LayoutProps) {
   return (
