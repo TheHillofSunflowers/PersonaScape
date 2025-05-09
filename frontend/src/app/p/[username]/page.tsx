@@ -226,7 +226,8 @@ export default function PublicProfilePage() {
                   profileId={profile.id} 
                   size="lg" 
                   showCount={true}
-                  className="ml-auto" 
+                  className="ml-auto"
+                  username={username}
                 />
               </div>
             )}

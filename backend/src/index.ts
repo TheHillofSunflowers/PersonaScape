@@ -34,7 +34,7 @@ const app = express();
 
 // More permissive CORS configuration for development
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'], // Allow frontend domains explicitly
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://personascape.vercel.app'], // Allow frontend domains explicitly
   credentials: true, // Enable credentials for auth
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma'],

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 // Get properly formatted API base URL
-const baseURL = 'http://localhost:5000';
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 console.log('API client initialized with base URL:', baseURL);
 
 // Helper function to get auth token from cookies
@@ -63,6 +63,7 @@ const api = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
   // Add longer timeout for debugging
   timeout: 15000
@@ -78,6 +79,13 @@ api.interceptors.request.use((config) => {
   }
   // Log all requests for debugging
   console.log(`🔄 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+  console.log('Request config:', {
+    headers: config.headers,
+    withCredentials: config.withCredentials,
+    baseURL: config.baseURL,
+    url: config.url,
+    method: config.method
+  });
   return config;
 });
 

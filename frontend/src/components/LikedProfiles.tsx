@@ -136,6 +136,7 @@ export default function LikedProfiles({
                 profileId={profile.id} 
                 initialLikesCount={profile.likesCount} 
                 size="sm"
+                username={profile.username}
               />
             </div>
           </li>

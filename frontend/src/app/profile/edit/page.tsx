@@ -133,20 +133,34 @@ export default function EditProfilePage() {
         socialLinks: socialLinks.length > 0 ? socialLinks : null
       };
       
-      // Create or update profile
-      await api.put('/api/profile', profileData);
-      setSaveMessage('Profile saved successfully!');
+      console.log('Sending profile update with data:', profileData);
       
-      // Refresh page after 1.5 seconds
-      setTimeout(() => {
-        if (user?.username) {
-          router.push(`/p/${user.username}`);
+      try {
+        // Create or update profile
+        const response = await api.put('/api/profile', profileData);
+        console.log('Profile update successful:', response.data);
+        setSaveMessage('Profile saved successfully!');
+        
+        // Refresh page after 1.5 seconds
+        setTimeout(() => {
+          if (user?.username) {
+            router.push(`/p/${user.username}`);
+          }
+        }, 1500);
+      } catch (apiError: any) {
+        console.error('API Error details:', apiError);
+        if (apiError.message === 'Network Error') {
+          setError('Network error. This could be caused by CORS or server connectivity issues. Please try again.');
+        } else if (apiError.response) {
+          setError(`Error: ${apiError.response.status} - ${apiError.response.data?.error || 'Unknown error'}`);
+        } else {
+          setError(`Failed to save profile: ${apiError.message}`);
         }
-      }, 1500);
+      }
       
     } catch (err) {
-      console.error('Error saving profile:', err);
-      setError('Failed to save profile. Please try again.');
+      console.error('Error in form submission:', err);
+      setError('Failed to process form data. Please try again.');
     } finally {
       setIsSaving(false);
     }

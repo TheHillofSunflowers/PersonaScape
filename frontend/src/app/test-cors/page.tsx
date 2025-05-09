@@ -70,7 +70,7 @@ export default function TestCorsPage() {
     
     const results = [];
     const baseUrls = [
-      'http://localhost:5000',
+      process.env.NEXT_PUBLIC_API_BASE_URL,
       'http://127.0.0.1:5000'
     ];
     

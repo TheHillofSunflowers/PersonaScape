@@ -10,7 +10,7 @@ console.log('Testing backend server connection...');
 // Try to connect to the backend server
 const options = {
   hostname: 'localhost',
-  port: 5000,
+  port: process.env.PORT,
   path: '/api/test-cors',
   method: 'GET',
   headers: {

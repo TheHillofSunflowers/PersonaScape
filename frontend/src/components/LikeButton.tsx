@@ -10,6 +10,7 @@ interface LikeButtonProps {
   showCount?: boolean;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  username?: string;
 }
 
 export default function LikeButton({ 
@@ -17,13 +18,15 @@ export default function LikeButton({
   initialLikesCount = 0, 
   showCount = true,
   className = '',
-  size = 'md'
+  size = 'md',
+  username
 }: LikeButtonProps) {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   // Size classes for the button
   const sizeClasses = {
@@ -32,10 +35,20 @@ export default function LikeButton({
     lg: 'text-lg p-3'
   };
 
+  // Check if this is the user's own profile
+  useEffect(() => {
+    if (user && username && user.username === username) {
+      setIsOwnProfile(true);
+    } else {
+      setIsOwnProfile(false);
+    }
+  }, [user, username]);
+
   // Check initial like status when component mounts - only if user is authenticated
   useEffect(() => {
     const fetchLikeStatus = async () => {
-      if (!isAuthenticated || loading) {
+      // Don't fetch like status if it's the user's own profile or if not authenticated
+      if (!isAuthenticated || loading || isOwnProfile) {
         setIsLoading(false);
         return;
       }
@@ -55,12 +68,17 @@ export default function LikeButton({
     };
 
     fetchLikeStatus();
-  }, [profileId, isAuthenticated, loading]);
+  }, [profileId, isAuthenticated, loading, isOwnProfile]);
 
   const handleLikeToggle = async () => {
     if (!isAuthenticated) {
       // Redirect to login or show login modal
       alert('Please log in to like profiles');
+      return;
+    }
+
+    // Don't allow liking if it's the user's own profile
+    if (isOwnProfile) {
       return;
     }
 
@@ -87,6 +105,15 @@ export default function LikeButton({
       setIsLoading(false);
     }
   };
+  
+  // If it's the user's own profile, just show the like count if requested
+  if (isOwnProfile) {
+    return showCount ? (
+      <div className={`flex items-center gap-1 ${className}`}>
+        <span className="text-gray-600 text-sm">{likesCount} likes</span>
+      </div>
+    ) : null;
+  }
 
   return (
     <div className={`flex items-center gap-1 ${className}`}>

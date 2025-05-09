@@ -69,7 +69,7 @@ async function testOptionsRequest() {
   
   const options = {
     hostname: 'localhost',
-    port: 5000,
+    port: process.env.PORT,
     path: '/api/profile/',
     method: 'OPTIONS',
     headers: {
@@ -104,7 +104,7 @@ async function testProfileUpdateRequest() {
   
   const options = {
     hostname: 'localhost',
-    port: 5000,
+    port: process.env.PORT,
     path: '/api/profile/',
     method: 'PUT',
     headers: {

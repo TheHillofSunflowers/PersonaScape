@@ -57,7 +57,7 @@ async function testOptionsRequest() {
   
   const options = {
     hostname: 'localhost',
-    port: 5000,
+    port: process.env.PORT,
     path: '/api/auth/login',
     method: 'OPTIONS',
     headers: {
@@ -92,7 +92,7 @@ async function testLoginRequest() {
   
   const options = {
     hostname: 'localhost',
-    port: 5000,
+    port: process.env.PORT,
     path: '/api/auth/login',
     method: 'POST',
     headers: {

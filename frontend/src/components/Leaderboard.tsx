@@ -109,6 +109,7 @@ export default function Leaderboard({
                 profileId={profile.id} 
                 initialLikesCount={profile.likesCount} 
                 size="sm"
+                username={profile.username}
               />
             </div>
           </li>
