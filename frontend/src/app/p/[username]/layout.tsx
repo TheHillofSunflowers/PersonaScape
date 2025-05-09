@@ -21,12 +21,13 @@ export async function generateMetadata({
   }
 }
 
-// No LayoutProps constraint, just define the function with its props directly
-export default function ProfileLayout({
-  children,
-}: {
+type ProfileLayoutProps = {
   children: React.ReactNode;
-}): React.ReactNode {
+}
+
+export default function ProfileLayout({
+  children
+}: ProfileLayoutProps) {
   return (
     <>
       {children}
