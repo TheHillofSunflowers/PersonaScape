@@ -14,7 +14,8 @@
       "typeRoots": ["./node_modules/@types", "./types"],
       "types": ["node"],
       "allowSyntheticDefaultImports": true,
-      "noImplicitAny": false
+      "noImplicitAny": false,
+      "ignoreDeprecations": "5.0"
     },
     "include": ["src/**/*", "prisma/**/*", "global.d.ts", "types/**/*"],
     "exclude": ["node_modules"]

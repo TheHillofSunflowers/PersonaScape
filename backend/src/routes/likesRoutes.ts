@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 import { 
   likeProfile, 
@@ -8,7 +8,7 @@ import {
   getLeaderboard 
 } from '../controllers/likesController';
 
-const router = express.Router();
+const router = Router();
 
 // Configure routes - public and authenticated endpoints
 // Public route - doesn't need authentication
