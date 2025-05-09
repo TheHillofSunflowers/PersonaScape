@@ -1,12 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# exit on error
+set -e
 
-# Install dependencies
+# Install dependencies including dev dependencies that contain type definitions
 npm install
 
 # Generate Prisma client
 npx prisma generate
 
-# Build TypeScript
+# Build the project
 npm run build
 
 echo "Build completed successfully!" 

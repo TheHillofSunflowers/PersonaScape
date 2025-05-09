@@ -1,38 +1,61 @@
-# Backend Deployment Guide
+# Deployment Guide for PersonaScape Backend
 
-## Deploying to Render
+This document provides instructions for deploying the PersonaScape backend API to Render.com.
 
-1. Create a new Web Service in Render
-2. Connect your GitHub repository
-3. Use the following settings:
-   - **Name**: personascape-api
-   - **Environment**: Node
-   - **Build Command**: `./build.sh`
-   - **Start Command**: `npm start`
+## Prerequisites
+
+- A [Render.com](https://render.com) account
+- A PostgreSQL database (can be hosted on Render or elsewhere)
+- Your project code in a Git repository (GitHub, GitLab, etc.)
+
+## Deployment Steps
+
+1. Log in to your Render account
+2. Go to the Dashboard and click "New +"
+3. Select "Web Service"
+4. Connect your repository
+5. Configure the service:
+   - Name: `personascape-api` (or your preferred name)
+   - Environment: `Node`
+   - Build Command: `./build.sh`
+   - Start Command: `npm start`
+   - Health Check Path: `/api/test-cors`
 
 ## Environment Variables
 
-Set the following environment variables in Render:
+Set these in the Render Dashboard:
 
 - `DATABASE_URL`: Your PostgreSQL connection string
-- `JWT_SECRET`: A secure random string for JWT token signing
+- `JWT_SECRET`: Secret key for JWT authentication
 - `NODE_ENV`: Set to `production`
-- `PORT`: Set to `5000` (or let Render assign one)
+- `PORT`: Set to `5000` or Render's default
 
-## Database Setup
+## Troubleshooting TypeScript Build Issues
 
-1. Create a PostgreSQL database in Render or use an external provider
-2. Set the `DATABASE_URL` environment variable to your database connection string
-3. The application will automatically run migrations on startup
+If you encounter TypeScript errors related to missing Node.js types:
 
-## Troubleshooting
+1. Make sure `@types/node` is in your `devDependencies` in package.json
+2. Check that your build.sh script installs dependencies with `npm install` (not `npm install --production`)
+3. Verify your tsconfig.json has proper configuration:
+   ```json
+   {
+     "compilerOptions": {
+       "types": ["node"],
+       "typeRoots": ["./node_modules/@types", "./types"]
+     }
+   }
+   ```
+4. Try manually triggering a clean build:
+   - Go to your service in Render Dashboard
+   - Click "Manual Deploy" > "Clear Build Cache & Deploy"
 
-If you encounter any issues:
+## Database Migrations
 
-1. Check the Render logs for error messages
-2. Verify that all environment variables are set correctly
-3. Ensure the database is accessible from Render
-4. Test the API endpoints using the built-in `/api/test-cors` endpoint
+Prisma migrations will run automatically via the postinstall script in package.json.
+
+## Verification
+
+After deployment, visit your service URL + `/api/test-cors` to verify the API is running correctly.
 
 ## Frontend Configuration
 
