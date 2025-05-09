@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 
 type Props = {
   params: { username: string }
@@ -26,9 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function ProfileLayout({ 
-  children,
-  params
-}: Props) {
+  children 
+}: { children: React.ReactNode }) {
   return (
     <>
       {children}

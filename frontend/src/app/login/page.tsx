@@ -51,9 +51,25 @@ export default function LoginPage() {
         login(res.data.token);
         router.push("/dashboard");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || err.message || "Login failed");
+      const errorMessage: string = 
+        typeof err === 'object' && 
+        err !== null && 
+        'response' in err && 
+        err.response && 
+        typeof err.response === 'object' && 
+        'data' in err.response && 
+        err.response.data && 
+        typeof err.response.data === 'object' && 
+        'message' in err.response.data && 
+        typeof err.response.data.message === 'string' ? 
+          err.response.data.message : 
+        err instanceof Error ? 
+          err.message : 
+          "Login failed";
+      
+      setError(errorMessage);
     }
   };
 
@@ -86,7 +102,7 @@ export default function LoginPage() {
         </button>
 
         <p className="text-sm mt-4 text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a href="/signup" className="text-blue-500 hover:underline">
                 Sign up
             </a>
