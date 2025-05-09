@@ -4,6 +4,13 @@ import axios, { AxiosInstance } from 'axios';
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 console.log('API client initialized with base URL:', baseURL);
 
+// Helper to ensure we don't duplicate /api/ paths
+const createEndpointUrl = (path: string): string => {
+  // If path already starts with /api, don't add the prefix again
+  const endpoint = path.startsWith('/api/') ? path : `/api${path.startsWith('/') ? path : '/' + path}`;
+  return `${baseURL}${endpoint}`;
+};
+
 // Helper function to get auth token from cookies
 const getCookie = (name: string): string | null => {
   if (typeof document === 'undefined') return null; // Check if running in browser
@@ -36,7 +43,7 @@ const getAuthToken = (): string | null => {
 const debugNetworkIssues = async () => {
   try {
     console.log('Attempting to verify connectivity with a simple fetch request...');
-    const testUrl = baseURL + '/api/test-cors';
+    const testUrl = createEndpointUrl('/test-cors');
     console.log('Testing connection to:', testUrl);
     
     const response = await fetch(testUrl, {
@@ -58,7 +65,7 @@ debugNetworkIssues();
 
 // Create API client with standard configuration
 const api = axios.create({
-  baseURL,
+  baseURL: baseURL + '/api',
   // Enable credentials for auth requests
   withCredentials: true,
   headers: {
@@ -122,7 +129,7 @@ api.interceptors.response.use(
 api.testConnection = async () => {
   try {
     // Test with direct fetch for reliability
-    const testUrl = baseURL + '/api/test-cors';
+    const testUrl = createEndpointUrl('/test-cors');
     console.log('Testing direct connection to:', testUrl);
     
     const response = await fetch(testUrl, {

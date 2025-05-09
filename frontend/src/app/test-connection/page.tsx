@@ -38,7 +38,7 @@ export default function TestConnectionPage() {
     try {
       const result = await api.testConnection();
       if (result.success) {
-        setTestResult(result.data);
+        setTestResult(result as TestResult);
       } else {
         setError(result.message || 'Connection failed with no specific error message');
       }
