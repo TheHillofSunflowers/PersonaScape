@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Leaderboard from '@/components/Leaderboard';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default function LeaderboardPage() {
   const [limit, setLimit] = useState(10);
 
