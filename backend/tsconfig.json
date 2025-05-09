@@ -10,9 +10,9 @@
       "skipLibCheck": true,
       "resolveJsonModule": true,
       "baseUrl": ".",
-      "lib": ["ES2018", "DOM", "DOM.Iterable"],
-      "typeRoots": ["./node_modules/@types", "./types"],
-      "types": ["node"]
+      "lib": ["ES2018", "DOM"],
+      "typeRoots": ["./node_modules/@types"],
+      "types": []
     },
     "include": ["src/**/*", "prisma/**/*"],
     "exclude": ["node_modules"]
