@@ -21,16 +21,11 @@ export async function generateMetadata({
   }
 }
 
-type ProfileLayoutProps = {
+// Simplest possible layout component
+export default function Layout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export default function ProfileLayout({
-  children
-}: ProfileLayoutProps) {
-  return (
-    <>
-      {children}
-    </>
-  )
+}) {
+  return children;
 } 
