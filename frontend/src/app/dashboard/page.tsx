@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import LikedProfiles from '@/components/LikedProfiles';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
