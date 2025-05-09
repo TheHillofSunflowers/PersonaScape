@@ -83,7 +83,7 @@ export default function PublicProfilePage() {
             if (errorData && errorData.error) {
               errorMsg = errorData.error;
             }
-          } catch (_) {
+          } catch {
             // If we can't parse the response, just use the default error message
           }
           setError(errorMsg);

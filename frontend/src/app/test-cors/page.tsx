@@ -1,9 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, ReactNode } from "react";
+
+// Define types for test results
+interface TestResult {
+  url: string;
+  method: string;
+  withCredentials: boolean;
+  status?: number;
+  statusText?: string;
+  headers?: Record<string, string>;
+  data?: unknown;
+  timeMs?: number;
+  timestamp: string;
+  error?: string;
+}
+
+// Helper function to check if data exists and is safe to render
+const isRenderableData = (data: unknown): boolean => {
+  return data !== null && data !== undefined;
+};
 
 export default function TestCorsPage() {
-  const [testResults, setTestResults] = useState<any[]>([]);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -36,7 +55,7 @@ export default function TestCorsPage() {
       let data;
       try {
         data = JSON.parse(responseData);
-      } catch (e) {
+      } catch {
         data = responseData;
       }
       
@@ -56,7 +75,7 @@ export default function TestCorsPage() {
         url,
         method,
         withCredentials,
-        error: (err as Error).message,
+        error: (err instanceof Error) ? err.message : String(err),
         timestamp: new Date().toISOString()
       };
     }
@@ -68,11 +87,11 @@ export default function TestCorsPage() {
     setError(null);
     setTestResults([]);
     
-    const results = [];
+    const results: TestResult[] = [];
     const baseUrls = [
       process.env.NEXT_PUBLIC_API_BASE_URL,
       'http://127.0.0.1:5000'
-    ];
+    ].filter(Boolean); // Filter out undefined/empty values
     
     const endpoints = [
       '/api/test-cors',
@@ -102,7 +121,7 @@ export default function TestCorsPage() {
       
       setTestResults(results);
     } catch (err) {
-      setError(`Test failed: ${(err as Error).message}`);
+      setError(`Test failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -152,7 +171,7 @@ export default function TestCorsPage() {
                     {result.error ? (
                       <span className="text-red-600">Error</span>
                     ) : (
-                      <span className={result.status >= 200 && result.status < 300 ? 'text-green-600' : 'text-red-600'}>
+                      <span className={result.status && result.status >= 200 && result.status < 300 ? 'text-green-600' : 'text-red-600'}>
                         {result.status} {result.statusText}
                       </span>
                     )}
@@ -164,19 +183,32 @@ export default function TestCorsPage() {
                       <details>
                         <summary className="cursor-pointer">View Details</summary>
                         <div className="mt-2 text-xs">
-                          <h4 className="font-bold">Headers:</h4>
-                          <pre className="bg-gray-100 p-2 mt-1 rounded overflow-x-auto">
-                            {JSON.stringify(result.headers, null, 2)}
-                          </pre>
+                          {result.headers && (
+                            <>
+                              <h4 className="font-bold">Headers:</h4>
+                              <pre className="bg-gray-100 p-2 mt-1 rounded overflow-x-auto">
+                                {JSON.stringify(result.headers, null, 2)}
+                              </pre>
+                            </>
+                          )}
                           
-                          <h4 className="font-bold mt-2">Data:</h4>
-                          <pre className="bg-gray-100 p-2 mt-1 rounded overflow-x-auto">
-                            {typeof result.data === 'object' ? JSON.stringify(result.data, null, 2) : result.data}
-                          </pre>
+                          {isRenderableData(result.data) && (
+                            <>
+                              <h4 className="font-bold mt-2">Data:</h4>
+                              <pre className="bg-gray-100 p-2 mt-1 rounded overflow-x-auto">
+                                {typeof result.data === 'object' ? 
+                                  JSON.stringify(result.data, null, 2) : 
+                                  String(result.data)
+                              }
+                              </pre>
+                            </>
+                          )}
                           
-                          <p className="mt-2">
-                            <span className="font-semibold">Time:</span> {result.timeMs}ms
-                          </p>
+                          {result.timeMs !== undefined && (
+                            <p className="mt-2">
+                              <span className="font-semibold">Time:</span> {result.timeMs}ms
+                            </p>
+                          )}
                         </div>
                       </details>
                     )}

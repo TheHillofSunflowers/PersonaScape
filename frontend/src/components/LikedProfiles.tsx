@@ -68,7 +68,7 @@ export default function LikedProfiles({
       <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
         <h2 className="text-xl font-bold mb-4">{title}</h2>
         <div className="p-4 text-center">
-          <p className="text-gray-500">Please log in to see the profiles you've liked</p>
+          <p className="text-gray-500">Please log in to see the profiles you&apos;ve liked</p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ export default function LikedProfiles({
     return (
       <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
         <h2 className="text-xl font-bold mb-4">{title}</h2>
-        <p className="text-gray-500 text-center py-4">You haven't liked any profiles yet</p>
+        <p className="text-gray-500 text-center py-4">You haven&apos;t liked any profiles yet</p>
       </div>
     );
   }

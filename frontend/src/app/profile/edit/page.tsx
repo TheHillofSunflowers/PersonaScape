@@ -93,7 +93,7 @@ export default function EditProfilePage() {
               customHtml: response.data.customHtml || ''
             });
           }
-        } catch (_) {
+        } catch {
           // If profile doesn't exist yet, we'll just use the default empty profile
           setIsNewProfile(true); // This is a new profile
           console.log('Creating new profile as none exists yet');
@@ -161,7 +161,7 @@ export default function EditProfilePage() {
         }
       }
       
-    } catch (_) {
+    } catch {
       console.error('Error in form submission:');
       setError('Failed to process form data. Please try again.');
     } finally {

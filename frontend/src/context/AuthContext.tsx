@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import api from "@/lib/api";
 
 type User = {
   id: string;
@@ -53,31 +52,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load token from localStorage and cookies on first render
-  useEffect(() => {
-    // Try to get token from cookie first (more secure)
-    let authToken = getCookie("auth_token");
-    
-    // Fall back to localStorage if no cookie
-    if (!authToken) {
-      authToken = localStorage.getItem("token");
-    }
-    
-    console.log("AuthProvider init - checking for token:", authToken ? "Token found" : "No token");
-    
-    if (authToken) {
-      console.log("Token found, setting token state and fetching user");
-      // Ensure token is stored in both places
-      localStorage.setItem("token", authToken);
-      setCookie("auth_token", authToken);
-      
-      setToken(authToken);
-      fetchUser(authToken);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const fetchUser = async (token: string) => {
     try {
       setLoading(true);
@@ -105,6 +79,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
+
+  // Load token from localStorage and cookies on first render
+  useEffect(() => {
+    // Try to get token from cookie first (more secure)
+    let authToken = getCookie("auth_token");
+    
+    // Fall back to localStorage if no cookie
+    if (!authToken) {
+      authToken = localStorage.getItem("token");
+    }
+    
+    console.log("AuthProvider init - checking for token:", authToken ? "Token found" : "No token");
+    
+    if (authToken) {
+      console.log("Token found, setting token state and fetching user");
+      // Ensure token is stored in both places
+      localStorage.setItem("token", authToken);
+      setCookie("auth_token", authToken);
+      
+      setToken(authToken);
+      fetchUser(authToken);
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [/* fetchUser is intentionally omitted to avoid infinite render loops */]);
 
   const login = (newToken: string) => {
     console.log("Login called with new token:", newToken.substring(0, 10) + "...");

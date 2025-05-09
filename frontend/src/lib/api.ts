@@ -68,7 +68,12 @@ const api = axios.create({
   // Add longer timeout for debugging
   timeout: 15000
 }) as AxiosInstance & {
-  testConnection: () => Promise<{ success: boolean, data?: any, error?: any, message?: string }>
+  testConnection: () => Promise<{ 
+    success: boolean, 
+    data?: unknown, 
+    error?: unknown, 
+    message?: string 
+  }>
 };
 
 // Add request interceptor to add auth token

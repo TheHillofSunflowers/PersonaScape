@@ -11,6 +11,19 @@ interface TestResult {
   statusText?: string;
 }
 
+interface ErrorWithMessage {
+  message: string;
+}
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as Record<string, unknown>).message === 'string'
+  );
+}
+
 export default function TestConnectionPage() {
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +42,8 @@ export default function TestConnectionPage() {
       } else {
         setError(result.message || 'Connection failed with no specific error message');
       }
-    } catch (err: any) {
-      setError(err.message || 'Unknown error occurred');
+    } catch (err: unknown) {
+      setError(isErrorWithMessage(err) ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -61,9 +74,9 @@ export default function TestConnectionPage() {
         message: 'Direct fetch connection successful',
         data: data
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Direct fetch failed:", err);
-      setError(`Direct fetch failed: ${err.message}`);
+      setError(`Direct fetch failed: ${isErrorWithMessage(err) ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -94,9 +107,9 @@ export default function TestConnectionPage() {
         message: 'Network information retrieved successfully',
         data: data
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Network info request failed:", err);
-      setError(`Network info request failed: ${err.message}`);
+      setError(`Network info request failed: ${isErrorWithMessage(err) ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -133,9 +146,9 @@ export default function TestConnectionPage() {
           statusText: response.statusText
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Signup endpoint test error:", err);
-      setError(`Signup endpoint test failed: ${err.message}`);
+      setError(`Signup endpoint test failed: ${isErrorWithMessage(err) ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -155,8 +168,8 @@ export default function TestConnectionPage() {
       const response = await fetch(customUrl);
       const data = await response.json();
       setTestResult(data);
-    } catch (err: any) {
-      setError(`Error connecting to custom URL: ${err.message}`);
+    } catch (err: unknown) {
+      setError(`Error connecting to custom URL: ${isErrorWithMessage(err) ? err.message : 'Unknown error'}`);
       console.error('Custom URL test error:', err);
     } finally {
       setLoading(false);
@@ -189,9 +202,9 @@ export default function TestConnectionPage() {
         message: 'Raw connection successful',
         data: data
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Raw connection test failed:", err);
-      setError(`Raw connection test failed: ${err.message}`);
+      setError(`Raw connection test failed: ${isErrorWithMessage(err) ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
