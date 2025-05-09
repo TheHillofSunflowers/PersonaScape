@@ -1,15 +1,12 @@
 import type { Metadata } from 'next';
 
-type Props = {
+type GenerateMetadataProps = {
   params: { username: string }
-  children: React.ReactNode
 }
 
 // Generate metadata dynamically based on the username
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // Make sure params is treated as a promise and awaited
-  const resolvedParams = await Promise.resolve(params);
-  const username = resolvedParams.username;
+export async function generateMetadata({ params }: GenerateMetadataProps): Promise<Metadata> {
+  const username = params.username;
   
   // You could fetch profile data here to get more details
   // but for simplicity we'll just use the username
@@ -24,9 +21,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+type LayoutProps = {
+  children: React.ReactNode;
+  params: { username: string };
+}
+
 export default function ProfileLayout({ 
-  children 
-}: { children: React.ReactNode }) {
+  children,
+  params 
+}: LayoutProps) {
   return (
     <>
       {children}
