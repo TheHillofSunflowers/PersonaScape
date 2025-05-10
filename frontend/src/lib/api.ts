@@ -6,9 +6,9 @@ console.log('API client initialized with base URL:', baseURL);
 
 // Helper to ensure we don't duplicate /api/ paths
 const createEndpointUrl = (path: string): string => {
-  // If path already starts with /api, don't add the prefix again
-  const endpoint = path.startsWith('/api/') ? path : `/api${path.startsWith('/') ? path : '/' + path}`;
-  return `${baseURL}${endpoint}`;
+  // Remove any leading /api/ from the path to avoid duplication
+  const cleanPath = path.replace(/^\/api\//, '');
+  return `${baseURL}/api/${cleanPath}`;
 };
 
 // Helper function to get auth token from cookies

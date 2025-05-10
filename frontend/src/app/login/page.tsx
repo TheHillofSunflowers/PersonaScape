@@ -17,59 +17,38 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     
-    const loginUrl = 'http://localhost:5000/api/auth/login';
     const loginData = { email, password };
     
     try {
-      console.log("Attempting direct fetch login...");
-      
-      try {
-        // First try with direct fetch
-        const response = await fetch(loginUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(loginData)
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Login successful:", data);
-          login(data.token); // Store token + fetch user info
-          router.push("/dashboard"); // Or your protected page
-          return;
-        } else {
-          console.warn("Login failed with status:", response.status);
-          throw new Error(response.status === 401 ? "Invalid email or password" : `Login failed with status: ${response.status}`);
-        }
-      } catch (fetchErr) {
-        console.warn("Direct fetch login failed:", fetchErr);
-        // Fall back to axios as a backup
-        console.log("Falling back to axios...");
-        const res = await api.post("/api/auth/login", loginData);
-        login(res.data.token);
-        router.push("/dashboard");
-      }
+      console.log("Attempting login...");
+      const res = await api.post("/auth/login", loginData);
+      console.log("Login successful:", res.data);
+      login(res.data.token);
+      router.push("/dashboard");
     } catch (err: unknown) {
       console.error("Login error:", err);
-      const errorMessage: string = 
-        typeof err === 'object' && 
-        err !== null && 
-        'response' in err && 
-        err.response && 
-        typeof err.response === 'object' && 
-        'data' in err.response && 
-        err.response.data && 
-        typeof err.response.data === 'object' && 
-        'message' in err.response.data && 
-        typeof err.response.data.message === 'string' ? 
-          err.response.data.message : 
-        err instanceof Error ? 
-          err.message : 
-          "Login failed";
-      
-      setError(errorMessage);
+      if (err && 
+          typeof err === 'object' && 
+          'name' in err && 
+          err.name === 'AxiosError' && 
+          'message' in err && 
+          err.message === 'Network Error') {
+        setError("Network error: Cannot connect to the server. Please check if the backend is running.");
+      } else if (err && 
+                typeof err === 'object' && 
+                'response' in err && 
+                err.response && 
+                typeof err.response === 'object' && 
+                'data' in err.response && 
+                err.response.data && 
+                typeof err.response.data === 'object' && 
+                'message' in err.response.data) {
+        setError(err.response.data.message as string);
+      } else if (err instanceof Error) {
+        setError(`Something went wrong: ${err.message}`);
+      } else {
+        setError('An unknown error occurred');
+      }
     }
   };
 

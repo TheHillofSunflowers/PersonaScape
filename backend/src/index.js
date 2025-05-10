@@ -39,7 +39,20 @@ const app = express();
 
 // More permissive CORS configuration for deployment
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://personascape.vercel.app'], // Allow frontend domains explicitly
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'https://personascape.vercel.app'
+    ];
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      console.warn(`Origin ${origin} not allowed by CORS`);
+      return callback(new Error('Not allowed by CORS'));
+    }
+    return callback(null, true);
+  },
   credentials: true, // Enable credentials for auth
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control', 'Pragma'],
