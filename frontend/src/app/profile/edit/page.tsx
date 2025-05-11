@@ -38,7 +38,7 @@ export default function EditProfilePage() {
   const [isNewProfile, setIsNewProfile] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function EditProfilePage() {
   const uploadImage = async (file: File): Promise<string> => {
     // This uses a public image hosting service for demo purposes
     // In production, you would use a more secure storage solution
-    setUploadingImage(true);
+    setIsUploading(true);
     
     try {
       const formData = new FormData();
@@ -165,7 +165,7 @@ export default function EditProfilePage() {
       console.error('Error uploading image:', error);
       throw error;
     } finally {
-      setUploadingImage(false);
+      setIsUploading(false);
     }
   };
 
@@ -194,7 +194,7 @@ export default function EditProfilePage() {
       if (imageFile) {
         try {
           profilePictureUrl = await uploadImage(imageFile);
-        } catch (uploadError) {
+        } catch (error) {
           setError('Failed to upload profile picture. Profile not saved.');
           setIsSaving(false);
           return;
@@ -340,6 +340,7 @@ export default function EditProfilePage() {
                   <p className="mt-1 text-xs text-gray-500">
                     Upload a square image for best results. Maximum size: 5MB.
                   </p>
+                  {isUploading && <p className="mt-1 text-xs text-blue-500">Uploading image...</p>}
                 </div>
               </div>
             </div>
