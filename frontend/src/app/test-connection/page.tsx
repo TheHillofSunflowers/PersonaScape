@@ -3,9 +3,23 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 
+// Define types for API responses
+interface ApiResponse {
+  message?: string;
+  timestamp?: string;
+  headers?: Record<string, string>;
+  [key: string]: unknown;
+}
+
+interface ConnectionError {
+  message: string;
+  code?: string;
+  name?: string;
+}
+
 export default function TestConnectionPage() {
-  const [apiResponse, setApiResponse] = useState<any>(null);
-  const [fetchResponse, setFetchResponse] = useState<any>(null);
+  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
+  const [fetchResponse, setFetchResponse] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [env, setEnv] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +40,7 @@ export default function TestConnectionPage() {
 
       try {
         // Test using API client
-        const apiResult = await api.get('/test-cors');
+        const apiResult = await api.get<ApiResponse>('/test-cors');
         setApiResponse(apiResult.data);
         
         // Also test with direct fetch
@@ -34,11 +48,12 @@ export default function TestConnectionPage() {
           `${process.env.NEXT_PUBLIC_API_URL || 'https://personascape.onrender.com'}/api/test-cors`, 
           { mode: 'cors' }
         );
-        const fetchData = await fetchResult.json();
+        const fetchData = await fetchResult.json() as ApiResponse;
         setFetchResponse(fetchData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Connection test failed:', err);
-        setError(err.message || 'Failed to connect to API');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to connect to API';
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
