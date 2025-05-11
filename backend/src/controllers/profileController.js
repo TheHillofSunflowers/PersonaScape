@@ -26,14 +26,49 @@ const getProfile = async (req, res, next) => {
         github: user.profile.socialLinks.github || null,
         twitter: user.profile.socialLinks.twitter || null,
         linkedin: user.profile.socialLinks.linkedin || null
-      } : null
+      } : null,
+      // Add default profile picture if the column doesn't exist yet
+      profilePicture: user.profile?.profilePicture || null
     };
 
     console.log('Sending profile data:', profileData);
     res.json(profileData);
   } catch (err) {
     console.error('Error in getProfile:', err);
-    next(err);
+    // Check if it's a missing column error
+    if (err.code === 'P2022' && err.meta?.column === 'Profile.profilePicture') {
+      console.log('Missing profilePicture column in database, returning profile without it');
+      try {
+        // Try again without including the profilePicture field
+        const user = await prisma.user.findUnique({
+          where: { username },
+          include: { profile: true },
+        });
+        
+        if (!user) {
+          res.status(404).json({ error: 'Profile not found' });
+          return;
+        }
+        
+        const profileData = {
+          ...user.profile,
+          username: user.username,
+          socialLinks: user.profile?.socialLinks ? {
+            github: user.profile.socialLinks.github || null,
+            twitter: user.profile.socialLinks.twitter || null,
+            linkedin: user.profile.socialLinks.linkedin || null
+          } : null,
+          profilePicture: null // Add default value
+        };
+        
+        res.json(profileData);
+      } catch (retryErr) {
+        console.error('Error in getProfile retry:', retryErr);
+        next(retryErr);
+      }
+    } else {
+      next(err);
+    }
   }
 };
 
@@ -93,29 +128,29 @@ const updateProfile = async (req, res, next) => {
     }
 
     try {
+      // Create update object without profilePicture first (compatible with old schema)
+      const baseUpdateData = { 
+        bio, 
+        hobbies, 
+        socialLinks, 
+        customHtml, 
+        theme
+      };
+      
+      const baseCreateData = {
+        userId: parseInt(userId),
+        ...baseUpdateData
+      };
+      
+      // First try without profilePicture in case column doesn't exist yet
       const profile = await prisma.profile.upsert({
         where: { userId: parseInt(userId) },
-        update: { 
-          bio, 
-          hobbies, 
-          socialLinks, 
-          customHtml, 
-          theme,
-          profilePicture
-        },
-        create: {
-          userId: parseInt(userId),
-          bio,
-          hobbies,
-          socialLinks,
-          customHtml,
-          theme,
-          profilePicture
-        },
+        update: baseUpdateData,
+        create: baseCreateData,
       });
 
       console.log('Profile updated successfully:', profile.id);
-      res.json(profile);
+      res.json({...profile, profilePicture: null}); // Add profilePicture: null to response
     } catch (dbError) {
       console.error('Database error during profile update:', dbError);
       res.status(500).json({ 

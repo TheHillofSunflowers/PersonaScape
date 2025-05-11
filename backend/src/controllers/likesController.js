@@ -201,42 +201,55 @@ const getLikedProfiles = async (req, res, next) => {
 
     const userIdNum = parseInt(userId);
 
-    // Use Prisma to get the liked profiles with their user information
-    const likedProfiles = await prisma.profileLike.findMany({
-      where: {
-        userId: userIdNum
-      },
-      include: {
-        profile: {
-          include: {
-            User: {
-              select: {
-                username: true
+    try {
+      // Use Prisma to get the liked profiles with their user information
+      const likedProfiles = await prisma.profileLike.findMany({
+        where: {
+          userId: userIdNum
+        },
+        include: {
+          profile: {
+            include: {
+              User: {
+                select: {
+                  username: true
+                }
               }
             }
           }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
+      });
+
+      // Format the results for the response
+      const formattedProfiles = likedProfiles.map(like => ({
+        id: like.profile.id,
+        userId: like.profile.userId,
+        bio: like.profile.bio,
+        theme: like.profile.theme,
+        likesCount: like.profile.likesCount,
+        username: like.profile.User?.username,
+        likedAt: like.createdAt,
+        profilePicture: like.profile.profilePicture || null
+      }));
+
+      res.json({
+        likedProfiles: formattedProfiles
+      });
+    } catch (dbError) {
+      // Check if the error is because the table doesn't exist
+      if (dbError.code === 'P2021' && dbError.meta?.table?.includes('ProfileLike')) {
+        console.log('ProfileLike table does not exist yet, returning empty array');
+        // Return empty array if table doesn't exist yet
+        res.json({
+          likedProfiles: []
+        });
+      } else {
+        throw dbError; // rethrow for other errors
       }
-    });
-
-    // Format the results for the response
-    const formattedProfiles = likedProfiles.map(like => ({
-      id: like.profile.id,
-      userId: like.profile.userId,
-      bio: like.profile.bio,
-      theme: like.profile.theme,
-      likesCount: like.profile.likesCount,
-      username: like.profile.User?.username,
-      likedAt: like.createdAt,
-      profilePicture: like.profile.profilePicture
-    }));
-
-    res.json({
-      likedProfiles: formattedProfiles
-    });
+    }
   } catch (err) {
     console.error('Error in getLikedProfiles:', err);
     next(err);
@@ -249,39 +262,82 @@ const getLikedProfiles = async (req, res, next) => {
  */
 const getLeaderboard = async (req, res, next) => {
   try {
-    // Get the top profiles by likes count
-    const topProfiles = await prisma.profile.findMany({
-      where: {
-        likesCount: {
-          gt: 0
-        }
-      },
-      include: {
-        User: {
-          select: {
-            username: true
+    try {
+      // Get the top profiles by likes count
+      const topProfiles = await prisma.profile.findMany({
+        where: {
+          likesCount: {
+            gt: 0
           }
-        }
-      },
-      orderBy: {
-        likesCount: 'desc'
-      },
-      take: 10 // Limit to top 10
-    });
+        },
+        include: {
+          User: {
+            select: {
+              username: true
+            }
+          }
+        },
+        orderBy: {
+          likesCount: 'desc'
+        },
+        take: 10 // Limit to top 10
+      });
 
-    // Format the results
-    const leaderboard = topProfiles.map(profile => ({
-      id: profile.id,
-      userId: profile.userId,
-      username: profile.User?.username,
-      likesCount: profile.likesCount,
-      theme: profile.theme,
-      profilePicture: profile.profilePicture
-    }));
+      // Format the results
+      const leaderboard = topProfiles.map(profile => ({
+        id: profile.id,
+        userId: profile.userId,
+        username: profile.User?.username,
+        likesCount: profile.likesCount,
+        theme: profile.theme,
+        profilePicture: profile.profilePicture || null
+      }));
 
-    res.json({
-      leaderboard
-    });
+      res.json({
+        leaderboard
+      });
+    } catch (dbError) {
+      // Check if the error is because the column doesn't exist
+      if (dbError.code === 'P2022' && dbError.meta?.column === 'profilePicture') {
+        console.log('profilePicture column does not exist yet, returning leaderboard without it');
+        
+        // Retry without expecting the profilePicture column
+        const topProfiles = await prisma.profile.findMany({
+          where: {
+            likesCount: {
+              gt: 0
+            }
+          },
+          include: {
+            User: {
+              select: {
+                username: true
+              }
+            }
+          },
+          orderBy: {
+            likesCount: 'desc'
+          },
+          take: 10 // Limit to top 10
+        });
+
+        // Format the results without profilePicture
+        const leaderboard = topProfiles.map(profile => ({
+          id: profile.id,
+          userId: profile.userId,
+          username: profile.User?.username,
+          likesCount: profile.likesCount,
+          theme: profile.theme,
+          profilePicture: null // Add null as default
+        }));
+
+        res.json({
+          leaderboard
+        });
+      } else {
+        throw dbError; // rethrow for other errors
+      }
+    }
   } catch (err) {
     console.error('Error in getLeaderboard:', err);
     next(err);

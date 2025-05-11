@@ -24,6 +24,10 @@ mkdir -p types
 echo "Generating Prisma client"
 npx prisma generate
 
+# Run Prisma migrations
+echo "Running Prisma migrations"
+npx prisma migrate deploy
+
 # Create empty directory structure if it doesn't exist
 mkdir -p dist/controllers dist/routes dist/middleware
 
