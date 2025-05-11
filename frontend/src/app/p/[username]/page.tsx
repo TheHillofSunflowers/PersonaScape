@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
+import LikeButton from "@/components/LikeButton";
 
 interface SocialLink {
   platform: string;
@@ -10,12 +11,15 @@ interface SocialLink {
 }
 
 interface Profile {
+  id: number;
+  userId: number;
   username: string;
   bio: string;
   hobbies: string | null;
   socialLinks: SocialLink[] | null;
   theme: string;
   customHtml?: string | null;
+  likesCount: number;
 }
 
 export default function ProfilePage() {
@@ -65,7 +69,16 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-3xl font-bold mb-4">{profile.username}</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold">{profile.username}</h1>
+          <LikeButton 
+            profileId={profile.id} 
+            initialLikesCount={profile.likesCount || 0}
+            size="lg"
+            username={profile.username}
+          />
+        </div>
+        
         <p className="text-gray-600 mb-4">{profile.bio}</p>
         
         {hobbiesArray.length > 0 && (
