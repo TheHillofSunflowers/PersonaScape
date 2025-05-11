@@ -23,7 +23,20 @@ export const getProfile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    res.json(user.profile);
+    // Format the profile data
+    const profileData = {
+      ...user.profile,
+      username: user.username,
+      // Ensure socialLinks is in the correct format
+      socialLinks: user.profile?.socialLinks ? {
+        github: user.profile.socialLinks.github || null,
+        twitter: user.profile.socialLinks.twitter || null,
+        linkedin: user.profile.socialLinks.linkedin || null
+      } : null
+    };
+
+    console.log('Sending profile data:', profileData);
+    res.json(profileData);
   } catch (err) {
     console.error('Error in getProfile:', err);
     next(err);
