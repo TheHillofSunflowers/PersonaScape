@@ -10,7 +10,6 @@ interface CommentFormProps {
 }
 
 export default function CommentForm({
-  profileId,
   parentId = null,
   editComment = null,
   onSubmit,

@@ -25,6 +25,7 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
   
   useEffect(() => {
     fetchComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileId, page]);
   
   const fetchComments = async () => {
@@ -51,9 +52,9 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
     setPage(prev => prev + 1);
   };
   
-  const handleCreateComment = async (content: string, parentId: number | null = null) => {
+  const handleCreateComment = async (content: string, parentId?: number | null) => {
     try {
-      const newComment = await createComment(profileId, content, parentId);
+      const newComment = await createComment(profileId, content, parentId || undefined);
       
       if (!parentId) {
         // Add new root comment to the top
@@ -61,18 +62,19 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
       } else {
         // Add reply to the parent comment
         setComments(prev => 
-          prev.map(comment => 
-            comment.id === parentId 
-              ? {
-                  ...comment,
-                  replies: [...(comment.replies || []), newComment],
-                  _count: {
-                    ...(comment._count || {}),
-                    replies: ((comment._count?.replies || 0) + 1)
-                  }
+          prev.map(comment => {
+            if (comment.id === parentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), newComment],
+                _count: {
+                  ...(comment._count || { likes: 0, replies: 0 }),
+                  replies: ((comment._count?.replies || 0) + 1)
                 }
-              : comment
-          )
+              } as CommentType;
+            }
+            return comment;
+          })
         );
       }
       
@@ -95,7 +97,7 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
         prev.map(comment => {
           // If this is the comment being edited
           if (comment.id === updatedComment.id) {
-            return { ...comment, content: updatedComment.content };
+            return { ...comment, content: updatedComment.content } as CommentType;
           }
           
           // Check if the edited comment is a reply
@@ -104,10 +106,10 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
               ...comment,
               replies: comment.replies.map(reply => 
                 reply.id === updatedComment.id 
-                  ? { ...reply, content: updatedComment.content }
+                  ? { ...reply, content: updatedComment.content } as CommentType
                   : reply
               )
-            };
+            } as CommentType;
           }
           
           return comment;
@@ -139,10 +141,10 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
             ...comment,
             replies: comment.replies.filter(reply => reply.id !== commentId),
             _count: {
-              ...(comment._count || {}),
-              replies: ((comment._count?.replies || 0) - 1)
+              ...(comment._count || { likes: 0, replies: 0 }),
+              replies: Math.max(0, (comment._count?.replies || 1) - 1)
             }
-          };
+          } as CommentType;
         }
         return comment;
       });
@@ -165,13 +167,6 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
   
   const handleCancelEdit = () => {
     setEditComment(null);
-  };
-  
-  const getReplyingToUsername = () => {
-    if (!replyToId) return null;
-    
-    const comment = comments.find(c => c.id === replyToId);
-    return comment ? comment.user.username : null;
   };
   
   return (
@@ -216,7 +211,7 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
                 <React.Fragment key={comment.id}>
                   <Comment
                     comment={comment}
-                    currentUserId={user?.id}
+                    currentUserId={user ? parseInt(user.id) : null}
                     onReply={handleReply}
                     onEdit={handleEdit}
                     onDelete={handleDeleteComment}
