@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
 import LikeButton from "@/components/LikeButton";
+import Image from "next/image";
 
 interface SocialLink {
   platform: string;
@@ -20,6 +21,7 @@ interface Profile {
   theme: string;
   customHtml?: string | null;
   likesCount: number;
+  profilePicture?: string | null;
 }
 
 export default function ProfilePage() {
@@ -69,8 +71,25 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">{profile.username}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200 mr-4 flex-shrink-0">
+              {profile.profilePicture ? (
+                <Image 
+                  src={profile.profilePicture} 
+                  alt={`${profile.username}'s profile picture`}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500 font-bold text-xl">
+                  {profile.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <h1 className="text-3xl font-bold">{profile.username}</h1>
+          </div>
           <LikeButton 
             profileId={profile.id} 
             initialLikesCount={profile.likesCount || 0}

@@ -230,7 +230,8 @@ const getLikedProfiles = async (req, res, next) => {
       theme: like.profile.theme,
       likesCount: like.profile.likesCount,
       username: like.profile.User?.username,
-      likedAt: like.createdAt
+      likedAt: like.createdAt,
+      profilePicture: like.profile.profilePicture
     }));
 
     res.json({
@@ -274,7 +275,8 @@ const getLeaderboard = async (req, res, next) => {
       userId: profile.userId,
       username: profile.User?.username,
       likesCount: profile.likesCount,
-      theme: profile.theme
+      theme: profile.theme,
+      profilePicture: profile.profilePicture
     }));
 
     res.json({

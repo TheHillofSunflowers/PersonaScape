@@ -13,6 +13,7 @@ interface ProfileSummary {
   theme: string | null;
   likesCount: number;
   likedAt: string;
+  profilePicture?: string | null;
 }
 
 interface LeaderboardProfile {
@@ -22,6 +23,7 @@ interface LeaderboardProfile {
   bio: string | null;
   theme: string | null;
   likesCount: number;
+  profilePicture?: string | null;
 }
 
 // Like a profile

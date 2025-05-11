@@ -27,6 +27,7 @@ export default function LikeButton({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Size classes for the button
   const sizeClasses = {
@@ -77,8 +78,10 @@ export default function LikeButton({
       return;
     }
 
-    // Don't allow liking if it's the user's own profile
+    // Don't allow liking if it's the user's own profile - show tooltip instead
     if (isOwnProfile) {
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 3000); // Hide tooltip after 3 seconds
       return;
     }
 
@@ -106,13 +109,31 @@ export default function LikeButton({
     }
   };
   
-  // If it's the user's own profile, just show the like count if requested
+  // If it's the user's own profile, show a disabled heart with tooltip
   if (isOwnProfile) {
-    return showCount ? (
-      <div className={`flex items-center gap-1 ${className}`}>
-        <span className="text-gray-600 text-sm">{likesCount} likes</span>
+    return (
+      <div className={`flex items-center gap-1 ${className} relative`}>
+        <button
+          onClick={handleLikeToggle}
+          className={`flex items-center justify-center rounded-full ${sizeClasses[size]} 
+            text-gray-300 cursor-not-allowed`}
+          aria-label="Cannot like your own profile"
+        >
+          <span>❤</span>
+        </button>
+        
+        {showCount && (
+          <span className="text-gray-600 text-sm">{likesCount} likes</span>
+        )}
+        
+        {showTooltip && (
+          <div className="absolute top-full right-0 mt-2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+            You cannot like your own profile
+            <div className="absolute -top-1 right-2 w-2 h-2 bg-gray-800 rotate-45"></div>
+          </div>
+        )}
       </div>
-    ) : null;
+    );
   }
 
   return (

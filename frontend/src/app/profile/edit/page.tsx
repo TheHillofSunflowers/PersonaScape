@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/api';
+import Image from 'next/image';
 
 interface ProfileData {
   id?: number;
@@ -16,6 +17,7 @@ interface ProfileData {
   }[];
   theme: string;
   customHtml?: string;
+  profilePicture?: string | null;
 }
 
 export default function EditProfilePage() {
@@ -27,12 +29,16 @@ export default function EditProfilePage() {
     socialLinks: [{ platform: '', url: '' }],
     theme: 'default',
     customHtml: '',
+    profilePicture: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isNewProfile, setIsNewProfile] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -90,8 +96,14 @@ export default function EditProfilePage() {
               hobbies: hobbiesStr,
               socialLinks: socialLinksArray,
               theme: response.data.theme || 'default',
-              customHtml: response.data.customHtml || ''
+              customHtml: response.data.customHtml || '',
+              profilePicture: response.data.profilePicture || null,
             });
+            
+            // Set the preview URL if there's a profile picture
+            if (response.data.profilePicture) {
+              setPreviewUrl(response.data.profilePicture);
+            }
           }
         } catch {
           // If profile doesn't exist yet, we'll just use the default empty profile
@@ -107,6 +119,55 @@ export default function EditProfilePage() {
     
     fetchProfile();
   }, [user]);
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setImageFile(null);
+      setPreviewUrl(profile.profilePicture || null);
+      return;
+    }
+    
+    const file = e.target.files[0];
+    setImageFile(file);
+    
+    // Create a preview URL for the image
+    const fileUrl = URL.createObjectURL(file);
+    setPreviewUrl(fileUrl);
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    // This uses a public image hosting service for demo purposes
+    // In production, you would use a more secure storage solution
+    setUploadingImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      // Using ImgBB as a demo image hosting service
+      // You should replace this with your own image storage solution in production
+      const imgbbApiKey = 'YOUR_IMGBB_API_KEY'; // Replace with your API key
+      formData.append('key', imgbbApiKey);
+      
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data.url;
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -127,10 +188,24 @@ export default function EditProfilePage() {
         link => link.platform.trim() && link.url.trim()
       );
       
+      // Upload image if there's a new image file
+      let profilePictureUrl = profile.profilePicture;
+      
+      if (imageFile) {
+        try {
+          profilePictureUrl = await uploadImage(imageFile);
+        } catch (uploadError) {
+          setError('Failed to upload profile picture. Profile not saved.');
+          setIsSaving(false);
+          return;
+        }
+      }
+      
       const profileData = {
         ...profile,
         hobbies: hobbiesArray,
-        socialLinks: socialLinks.length > 0 ? socialLinks : null
+        socialLinks: socialLinks.length > 0 ? socialLinks : null,
+        profilePicture: profilePictureUrl
       };
       
       console.log('Sending profile update with data:', profileData);
@@ -226,6 +301,48 @@ export default function EditProfilePage() {
                 {saveMessage}
               </div>
             )}
+            
+            {/* Profile Picture Upload */}
+            <div className="mb-6">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="profilePicture">
+                Profile Picture
+              </label>
+              
+              <div className="flex items-center space-x-4">
+                {/* Preview Image */}
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                  {previewUrl ? (
+                    <Image 
+                      src={previewUrl} 
+                      alt="Profile picture preview" 
+                      width={96} 
+                      height={96} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400">No Image</span>
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    id="profilePicture"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-blue-50 file:text-blue-700
+                      hover:file:bg-blue-100"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Upload a square image for best results. Maximum size: 5MB.
+                  </p>
+                </div>
+              </div>
+            </div>
             
             {/* Bio */}
             <div className="mb-6">

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getLeaderboard } from '@/lib/likes-api';
 import Link from 'next/link';
 import LikeButton from './LikeButton';
+import Image from 'next/image';
 
 interface LeaderboardProfile {
   id: number;
@@ -12,6 +13,7 @@ interface LeaderboardProfile {
   bio: string | null;
   theme: string | null;
   likesCount: number;
+  profilePicture?: string | null;
 }
 
 interface LeaderboardProps {
@@ -95,6 +97,21 @@ export default function Leaderboard({
           >
             <div className="mr-3 font-bold text-lg text-gray-500 w-8 text-center">
               {index + 1}
+            </div>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0">
+              {profile.profilePicture ? (
+                <Image 
+                  src={profile.profilePicture} 
+                  alt={`${profile.username}'s profile picture`}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500 font-bold">
+                  {profile.username.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <Link 

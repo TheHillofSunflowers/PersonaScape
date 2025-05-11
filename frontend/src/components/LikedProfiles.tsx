@@ -5,6 +5,7 @@ import { getLikedProfiles } from '@/lib/likes-api';
 import Link from 'next/link';
 import LikeButton from './LikeButton';
 import { useAuth } from '@/hooks/useAuth';
+import Image from 'next/image';
 
 interface ProfileSummary {
   id: number;
@@ -14,6 +15,7 @@ interface ProfileSummary {
   theme: string | null;
   likesCount: number;
   likedAt: string;
+  profilePicture?: string | null;
 }
 
 interface LikedProfilesProps {
@@ -120,6 +122,21 @@ export default function LikedProfiles({
             key={profile.id}
             className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors"
           >
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0">
+              {profile.profilePicture ? (
+                <Image 
+                  src={profile.profilePicture} 
+                  alt={`${profile.username}'s profile picture`}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500 font-bold">
+                  {profile.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
             <div className="flex-1">
               <Link 
                 href={`/p/${profile.username}`}

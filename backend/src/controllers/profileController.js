@@ -17,7 +17,20 @@ const getProfile = async (req, res, next) => {
       return;
     }
 
-    res.json(user.profile);
+    // Format the profile data
+    const profileData = {
+      ...user.profile,
+      username: user.username,
+      // Ensure socialLinks is in the correct format
+      socialLinks: user.profile?.socialLinks ? {
+        github: user.profile.socialLinks.github || null,
+        twitter: user.profile.socialLinks.twitter || null,
+        linkedin: user.profile.socialLinks.linkedin || null
+      } : null
+    };
+
+    console.log('Sending profile data:', profileData);
+    res.json(profileData);
   } catch (err) {
     console.error('Error in getProfile:', err);
     next(err);
@@ -28,7 +41,7 @@ const getProfile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
-    let { bio, hobbies, socialLinks, customHtml, theme } = req.body;
+    let { bio, hobbies, socialLinks, customHtml, theme, profilePicture } = req.body;
 
     console.log('Profile update request received');
     console.log('userId from token:', userId, '(type:', typeof userId, ')');
@@ -45,6 +58,7 @@ const updateProfile = async (req, res, next) => {
     bio = bio || '';
     customHtml = customHtml || '';
     theme = theme || 'default';
+    profilePicture = profilePicture || null;
 
     // Convert hobbies to string if it's an array
     if (Array.isArray(hobbies)) {
@@ -65,6 +79,7 @@ const updateProfile = async (req, res, next) => {
     console.log('- socialLinks:', JSON.stringify(socialLinks), '(type:', typeof socialLinks, ')');
     console.log('- customHtml:', customHtml ? 'present' : 'empty', '(type:', typeof customHtml, ')');
     console.log('- theme:', theme, '(type:', typeof theme, ')');
+    console.log('- profilePicture:', profilePicture ? 'present' : 'empty', '(type:', typeof profilePicture, ')');
 
     // Try to get the user first to make sure they exist
     const userExists = await prisma.user.findUnique({
@@ -85,7 +100,8 @@ const updateProfile = async (req, res, next) => {
           hobbies, 
           socialLinks, 
           customHtml, 
-          theme 
+          theme,
+          profilePicture
         },
         create: {
           userId: parseInt(userId),
@@ -94,6 +110,7 @@ const updateProfile = async (req, res, next) => {
           socialLinks,
           customHtml,
           theme,
+          profilePicture
         },
       });
 

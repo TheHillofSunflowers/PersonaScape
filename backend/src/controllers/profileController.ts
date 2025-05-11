@@ -51,7 +51,7 @@ export const updateProfile = async (
 ) => {
   try {
     const userId = req.userId;
-    let { bio, hobbies, socialLinks, customHtml, theme } = req.body;
+    let { bio, hobbies, socialLinks, customHtml, theme, profilePicture } = req.body;
 
     console.log('Profile update request received');
     console.log('userId from token:', userId, '(type:', typeof userId, ')');
@@ -68,6 +68,7 @@ export const updateProfile = async (
     bio = bio || '';
     customHtml = customHtml || '';
     theme = theme || 'default';
+    profilePicture = profilePicture || null;
 
     // Convert hobbies to string if it's an array
     if (Array.isArray(hobbies)) {
@@ -88,6 +89,7 @@ export const updateProfile = async (
     console.log('- socialLinks:', JSON.stringify(socialLinks), '(type:', typeof socialLinks, ')');
     console.log('- customHtml:', customHtml ? 'present' : 'empty', '(type:', typeof customHtml, ')');
     console.log('- theme:', theme, '(type:', typeof theme, ')');
+    console.log('- profilePicture:', profilePicture ? 'present' : 'empty', '(type:', typeof profilePicture, ')');
 
     // Try to get the user first to make sure they exist
     const userExists = await prisma.user.findUnique({
@@ -108,7 +110,8 @@ export const updateProfile = async (
           hobbies, 
           socialLinks, 
           customHtml, 
-          theme 
+          theme,
+          profilePicture
         },
         create: {
           userId: parseInt(userId),
@@ -117,6 +120,7 @@ export const updateProfile = async (
           socialLinks,
           customHtml,
           theme,
+          profilePicture
         },
       });
 

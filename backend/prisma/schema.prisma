@@ -30,6 +30,7 @@ model Profile {
   socialLinks  Json?
   customHtml   String?
   theme        String? // light/dark/custom
+  profilePicture String? // URL to the profile picture
   User         User    @relation(fields: [userId], references: [id])
   receivedLikes ProfileLike[]
   likesCount    Int    @default(0)
