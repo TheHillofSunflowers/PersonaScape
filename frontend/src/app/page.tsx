@@ -3,6 +3,7 @@
 import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/context/AuthContext";
+import api from "@/lib/api";
 
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -12,9 +13,9 @@ export default function Home() {
   useEffect(() => {
     const checkApi = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/test-cors');
+        const response = await api.get("/test-cors");
         
-        if (response.ok) {
+        if (response.status === 200) {
           setApiStatus('connected');
           setApiMessage('Backend API is running and accessible');
         } else {

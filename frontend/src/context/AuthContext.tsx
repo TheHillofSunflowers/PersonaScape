@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from "react";
+import api from "@/lib/api";
 
 type User = {
   id: string;
@@ -57,19 +58,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       console.log("Fetching user with token:", token.substring(0, 10) + "...");
       
-      const response = await fetch('http://localhost:5000/api/auth/me', {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get("/auth/me");
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log("User data fetched successfully:", data);
-        setUser(data.user);
+      if (response.data) {
+        console.log("User data fetched successfully:", response.data);
+        setUser(response.data.user);
       } else {
-        console.error("Failed to fetch user, status:", response.status);
+        console.error("Failed to fetch user data");
         logout();
       }
     } catch (err) {
