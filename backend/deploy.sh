@@ -45,43 +45,21 @@ DB_NAME=$(echo $DATABASE_URL | sed -E 's/^postgresql:\/\/[^\/]+\/([^?]+).*/\1/')
 
 echo "Extracted database connection details (host:port/dbname): $DB_HOST:$DB_PORT/$DB_NAME"
 
-# Create temporary .pgpass file for passwordless access
-echo "$DB_HOST:$DB_PORT:$DB_NAME:$DB_USER:$DB_PASSWORD" > ~/.pgpass
-chmod 600 ~/.pgpass
+# Check if this is our first deployment
+echo "Checking for existing database structure"
+HAS_TABLES=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';")
+HAS_TABLES=$(echo $HAS_TABLES | xargs)
 
-# Manually apply migration script to add missing columns
-echo "Applying manual migration SQL to add required columns"
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "ALTER TABLE \"Profile\" ADD COLUMN IF NOT EXISTS \"profilePicture\" TEXT;"
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "ALTER TABLE \"Profile\" ADD COLUMN IF NOT EXISTS \"likesCount\" INTEGER NOT NULL DEFAULT 0;"
-
-# Create ProfileLike table if it doesn't exist
-echo "Creating ProfileLike table if it doesn't exist"
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "
-CREATE TABLE IF NOT EXISTS \"ProfileLike\" (
-  \"id\" SERIAL NOT NULL,
-  \"profileId\" INTEGER NOT NULL,
-  \"userId\" INTEGER NOT NULL,
-  \"createdAt\" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT \"ProfileLike_pkey\" PRIMARY KEY (\"id\")
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS \"ProfileLike_profileId_userId_key\" ON \"ProfileLike\"(\"profileId\", \"userId\");
-
-ALTER TABLE \"ProfileLike\" DROP CONSTRAINT IF EXISTS \"ProfileLike_profileId_fkey\";
-ALTER TABLE \"ProfileLike\" ADD CONSTRAINT \"ProfileLike_profileId_fkey\" 
-  FOREIGN KEY (\"profileId\") REFERENCES \"Profile\"(\"id\") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE \"ProfileLike\" DROP CONSTRAINT IF EXISTS \"ProfileLike_userId_fkey\";
-ALTER TABLE \"ProfileLike\" ADD CONSTRAINT \"ProfileLike_userId_fkey\" 
-  FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE RESTRICT ON UPDATE CASCADE;
-"
-
-# Clean up credentials
-rm ~/.pgpass
-
-# Run Prisma migrations (for the tracking/versioning)
-echo "Running Prisma migrations"
-npx prisma migrate deploy
+# Use db push instead of migrations - this is more compatible with direct SQL alterations
+echo "Updating database schema with Prisma"
+if [ "$HAS_TABLES" -eq "0" ]; then
+  echo "Empty database detected. Creating schema from scratch."
+  npx prisma db push
+else
+  echo "Existing database detected. Pushing schema changes."
+  # Use --accept-data-loss flag in dev/staging, be careful in production
+  npx prisma db push --accept-data-loss
+fi
 
 # Create empty directory structure if it doesn't exist
 mkdir -p dist/controllers dist/routes dist/middleware
