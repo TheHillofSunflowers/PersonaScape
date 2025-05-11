@@ -194,7 +194,8 @@ export default function EditProfilePage() {
       if (imageFile) {
         try {
           profilePictureUrl = await uploadImage(imageFile);
-        } catch (error) {
+        } catch (err) {
+          console.error('Failed to upload profile picture:', err);
           setError('Failed to upload profile picture. Profile not saved.');
           setIsSaving(false);
           return;
