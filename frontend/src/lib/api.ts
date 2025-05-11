@@ -90,11 +90,11 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   
-  // Ensure URL starts with /api but avoid duplication
+  // Ensure URL starts with /api but avoid duplication and double slashes
   if (config.url) {
-    // Remove any existing /api prefix
-    const cleanUrl = config.url.replace(/^\/api\//, '');
-    // Add /api prefix if not already present
+    // Remove any existing /api prefix and leading/trailing slashes
+    const cleanUrl = config.url.replace(/^\/api\//, '').replace(/^\/+|\/+$/g, '');
+    // Add /api prefix
     config.url = `/api/${cleanUrl}`;
   }
   
