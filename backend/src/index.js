@@ -13,6 +13,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const likesRoutes = require('./routes/likesRoutes');
 const viewsRoutes = require('./routes/viewsRoutes');
 const publicRoutes = require('./routes/publicRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 // Import middleware
 const { requestLogger } = require('./middleware/debugMiddleware');
@@ -161,6 +162,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/likes', likesRoutes);
 app.use('/api/views', viewsRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/comments', commentRoutes);
 
 // Add 404 handler for API routes with a simple pattern
 app.use('/api', (req, res) => {

@@ -14,6 +14,7 @@ A full-stack web application that lets users create **customizable, shareable pr
 ✅ **Leaderboard** (View most popular profiles) 
 ✅ **Authorization** (Only the owner can edit their page)
 ✅ **Mobile-Friendly & Responsive Design** (Tailwind CSS)
+✅ **Comment System** (Leave comments on profiles with nested replies)
 
 ---
 
@@ -85,6 +86,18 @@ A full-stack web application that lets users create **customizable, shareable pr
 | POST   | `/likes/profile/:username` | Like/unlike a profile                 |
 | GET    | `/likes/leaderboard`       | Get most liked profiles               |
 | GET    | `/likes/profile/:username` | Check if current user liked a profile |
+
+### 💬 Comments
+
+| Method | Endpoint                 | Description                                |
+| ------ | ------------------------ | ------------------------------------------ |
+| GET    | `/comments/profile/:id`  | Get comments for a profile (paginated)     |
+| GET    | `/comments/:id`          | Get a specific comment with replies        |
+| POST   | `/comments`              | Create a new comment/reply (auth required) |
+| PUT    | `/comments/:id`          | Update a comment (auth required)           |
+| DELETE | `/comments/:id`          | Delete a comment (auth required)           |
+| POST   | `/comments/:id/like`     | Like/unlike a comment (auth required)      |
+| GET    | `/comments/:id/like`     | Check if user liked a comment             |
 
 ---
 
@@ -158,7 +171,6 @@ npm run dev
 
 ## ✅ TODO / Future Features
 
-* Comment system for profiles
 * Enhanced analytics (views, engagement metrics)
 * Profile templates/themes marketplace
 * User following/connections system

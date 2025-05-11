@@ -20,6 +20,8 @@ model User {
   password  String
   profile   Profile?
   likes     ProfileLike[]
+  comments  Comment[]      // User's comments
+  commentLikes CommentLike[] // User's comment likes
 }
 
 model Profile {
@@ -36,6 +38,7 @@ model Profile {
   likesCount    Int    @default(0)
   viewsCount    Int    @default(0)  // Total number of views
   receivedViews ProfileView[] // Relation to the viewers
+  comments      Comment[]      // Comments on this profile
 }
 
 model ProfileLike {
@@ -67,4 +70,36 @@ model ProfileView {
   
   // Unique constraint to prevent duplicate views
   @@unique([profileId, viewerId, ipAddress])
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  content     String
+  profileId   Int       // The profile this comment is on
+  userId      Int       // The user who created the comment
+  parentId    Int?      // Null for root comments, populated for replies
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Define relations
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("CommentReplies")
+  likes       CommentLike[]
+  likesCount  Int       @default(0)
+}
+
+model CommentLike {
+  id          Int       @id @default(autoincrement())
+  commentId   Int       // The comment that was liked
+  userId      Int       // The user who liked the comment
+  createdAt   DateTime  @default(now())
+  
+  // Define relations
+  comment     Comment   @relation(fields: [commentId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  
+  // Ensure a user can only like a comment once
+  @@unique([commentId, userId])
 }

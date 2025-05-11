@@ -126,12 +126,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
-          <div className="mt-4 text-center">
-            <Link href="/test-connection" className="text-blue-600 hover:underline text-sm">
-              Advanced Connection Diagnostic
-            </Link>
-          </div>
         </div>
         
         {/* Footer */}

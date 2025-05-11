@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import api from "@/lib/api";
 import LikeButton from "@/components/LikeButton";
 import ViewCount from "@/components/ViewCount";
+import CommentSection from "@/components/CommentSection";
 import { recordProfileView } from "@/lib/views-api";
 import Image from "next/image";
 
@@ -155,6 +156,11 @@ export default function ProfilePage() {
             dangerouslySetInnerHTML={{ __html: profile.customHtml }}
           />
         )}
+      </div>
+      
+      {/* Add the Comment Section */}
+      <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
+        <CommentSection profileId={profile.id} />
       </div>
     </div>
   );
