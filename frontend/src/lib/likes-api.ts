@@ -61,8 +61,9 @@ export const checkLikeStatus = async (profileId: number): Promise<LikeStatus> =>
 // Get profiles liked by the user
 export const getLikedProfiles = async (): Promise<ProfileSummary[]> => {
   try {
-    const response = await api.get<ProfileSummary[]>('/api/likes/user');
-    return response.data;
+    const response = await api.get<ProfileSummary[]>('/likes/user');
+    // Ensure we always return an array
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Error getting liked profiles:', error);
     // Return an empty array instead of throwing
@@ -74,8 +75,9 @@ export const getLikedProfiles = async (): Promise<ProfileSummary[]> => {
 export const getLeaderboard = async (limit: number = 10): Promise<LeaderboardProfile[]> => {
   try {
     // Use a public endpoint that doesn't require authentication
-    const response = await api.get<LeaderboardProfile[]>(`/api/public/leaderboard?limit=${limit}`);
-    return response.data;
+    const response = await api.get<LeaderboardProfile[]>(`/public/leaderboard?limit=${limit}`);
+    // Ensure we always return an array
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Error getting leaderboard:', error);
     // Return an empty array instead of throwing
