@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
-// Get properly formatted API base URL
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+// Get properly formatted API base URL - preferring the deployed URL when available
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://personascape.onrender.com'; 
 console.log('API client initialized with base URL:', baseURL);
 
 // Helper to ensure we don't duplicate /api/ paths
