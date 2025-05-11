@@ -62,7 +62,9 @@ export async function getProfileViewStats(username: string): Promise<ViewStats> 
  */
 export async function getViewsLeaderboard(limit: number = 10): Promise<LeaderboardProfile[]> {
   try {
-    const response = await api.get<LeaderboardProfile[]>('/views/leaderboard');
+    const response = await api.get<LeaderboardProfile[]>('/views/leaderboard', {
+      params: { limit }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching views leaderboard:', error);

@@ -215,6 +215,9 @@ const getProfileViewStats = async (req, res, next) => {
  */
 const getViewsLeaderboard = async (req, res, next) => {
   try {
+    // Get limit from query params, default to 10
+    const limit = parseInt(req.query.limit, 10) || 10;
+    
     // Get profiles ordered by viewsCount
     const leaderboard = await prisma.profile.findMany({
       select: {
@@ -230,7 +233,7 @@ const getViewsLeaderboard = async (req, res, next) => {
       orderBy: {
         viewsCount: 'desc'
       },
-      take: 10 // Get top 10
+      take: limit // Use the limit from query params
     });
 
     // Format the response
