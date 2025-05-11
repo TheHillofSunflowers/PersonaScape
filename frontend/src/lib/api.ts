@@ -65,7 +65,7 @@ debugNetworkIssues();
 
 // Create API client with standard configuration
 const api = axios.create({
-  baseURL: baseURL + '/api',
+  baseURL: baseURL,  // Remove the /api suffix since we'll add it in the requests
   // Enable credentials for auth requests
   withCredentials: true,
   headers: {
@@ -83,12 +83,18 @@ const api = axios.create({
   }>
 };
 
-// Add request interceptor to add auth token
+// Add request interceptor to add auth token and ensure proper /api prefix
 api.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Ensure URL starts with /api
+  if (config.url && !config.url.startsWith('/api/')) {
+    config.url = `/api${config.url.startsWith('/') ? config.url : '/' + config.url}`;
+  }
+  
   // Log all requests for debugging
   console.log(`🔄 API Request: ${config.method?.toUpperCase()} ${config.url}`);
   console.log('Request config:', {

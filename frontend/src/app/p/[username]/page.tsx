@@ -7,7 +7,7 @@ import api from "@/lib/api";
 interface Profile {
   username: string;
   bio: string;
-  hobbies: string[];
+  hobbies: string[] | null;
   socialLinks: {
     github?: string;
     twitter?: string;
@@ -30,7 +30,12 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const response = await api.get<Profile>(`/profile/${username}`);
-        setProfile(response.data);
+        // Ensure hobbies is always an array
+        const profileData = {
+          ...response.data,
+          hobbies: Array.isArray(response.data.hobbies) ? response.data.hobbies : []
+        };
+        setProfile(profileData);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile");
