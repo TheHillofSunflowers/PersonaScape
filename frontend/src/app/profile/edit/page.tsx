@@ -145,8 +145,8 @@ export default function EditProfilePage() {
       formData.append('image', file);
       
       // Using ImgBB as a demo image hosting service
-      // You should replace this with your own image storage solution in production
-      const imgbbApiKey = 'YOUR_IMGBB_API_KEY'; // Replace with your API key
+      // Get API key from environment variable or use a fallback
+      const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY || '8b694df8ad4f44e950e115166611eb7e';
       formData.append('key', imgbbApiKey);
       
       const response = await fetch('https://api.imgbb.com/1/upload', {
@@ -154,12 +154,18 @@ export default function EditProfilePage() {
         body: formData,
       });
       
+      if (!response.ok) {
+        console.error('ImgBB API error:', response.status, response.statusText);
+        throw new Error(`Failed to upload image: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         return data.data.url;
       } else {
-        throw new Error('Failed to upload image');
+        console.error('ImgBB upload failed:', data);
+        throw new Error(data.error?.message || 'Failed to upload image');
       }
     } catch (error) {
       console.error('Error uploading image:', error);

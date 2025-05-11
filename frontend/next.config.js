@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
+  env: {
+    NEXT_PUBLIC_API_URL: 'https://personascape.onrender.com',
+    NEXT_PUBLIC_IMGBB_API_KEY: '7a4b641ad0ba4e587da1e436917e746a',
+    NEXT_PUBLIC_JWT_COOKIE_NAME: 'personascape_token'
+  },
   async rewrites() {
     return [
       // We're not using rewrites anymore as they can interfere with direct API calls
@@ -20,6 +25,9 @@ const nextConfig = {
         ]
       }
     ]
+  },
+  images: {
+    domains: ['i.ibb.co', 'image.ibb.co']
   }
 };
 
