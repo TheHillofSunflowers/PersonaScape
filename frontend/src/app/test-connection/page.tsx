@@ -11,12 +11,6 @@ interface ApiResponse {
   [key: string]: unknown;
 }
 
-interface ConnectionError {
-  message: string;
-  code?: string;
-  name?: string;
-}
-
 export default function TestConnectionPage() {
   const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [fetchResponse, setFetchResponse] = useState<ApiResponse | null>(null);
