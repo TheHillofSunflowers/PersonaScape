@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Leaderboard from '@/components/Leaderboard';
+import ViewsLeaderboard from '@/components/ViewsLeaderboard';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export default function LeaderboardPage() {
   const [limit, setLimit] = useState(10);
+  const [activeTab, setActiveTab] = useState<'likes' | 'views'>('likes');
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -22,9 +24,33 @@ export default function LeaderboardPage() {
           </Link>
         </div>
         
-        <p className="text-gray-600 mb-8">
-          Discover the most popular profiles on PersonaScape based on likes.
+        <p className="text-gray-600 mb-6">
+          Discover the most popular profiles on PersonaScape.
         </p>
+        
+        {/* Tabs for switching between likes and views */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button
+            onClick={() => setActiveTab('likes')}
+            className={`py-3 px-6 font-medium ${
+              activeTab === 'likes' 
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Most Liked
+          </button>
+          <button
+            onClick={() => setActiveTab('views')}
+            className={`py-3 px-6 font-medium ${
+              activeTab === 'views' 
+                ? 'border-b-2 border-blue-500 text-blue-500'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Most Viewed
+          </button>
+        </div>
         
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -47,23 +73,31 @@ export default function LeaderboardPage() {
           </div>
         </div>
         
-        <Leaderboard 
-          limit={limit} 
-          title="Most Popular Profiles" 
-          className="mb-8"
-        />
+        {activeTab === 'likes' ? (
+          <Leaderboard 
+            limit={limit} 
+            title="Most Liked Profiles" 
+            className="mb-8"
+          />
+        ) : (
+          <ViewsLeaderboard 
+            limit={limit} 
+            title="Most Viewed Profiles" 
+            className="mb-8"
+          />
+        )}
         
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-4">About Likes</h2>
+          <h2 className="text-xl font-bold mb-4">About PersonaScape Metrics</h2>
           <div className="space-y-4 text-gray-600">
             <p>
-              The leaderboard ranks profiles based on the number of likes they have received.
+              <strong>Likes</strong> - Users can like profiles they enjoy. You need to be logged in to like a profile, and you cannot like your own profile.
             </p>
             <p>
-              To like a profile, you need to be logged in. You can like any profile except your own.
+              <strong>Views</strong> - Profile views are counted uniquely - multiple views from the same visitor on the same day only count once.
             </p>
             <p>
-              Create your own profile today and start collecting likes!
+              Create your own profile today and start building your web presence!
             </p>
             <div className="pt-4">
               <Link 

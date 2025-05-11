@@ -28,6 +28,7 @@ const getProfile = async (req, res, next) => {
       theme: user.profile?.theme || 'default',
       username: user.username,
       likesCount: user.profile?.likesCount || 0,
+      viewsCount: user.profile?.viewsCount || 0,
       profilePicture: user.profile?.profilePicture || null
     };
 
@@ -76,6 +77,7 @@ const getProfile = async (req, res, next) => {
           theme: user.profile?.theme || 'default',
           username: user.username,
           likesCount: 0,
+          viewsCount: 0,
           profilePicture: null
         };
         

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
 import LikeButton from "@/components/LikeButton";
+import ViewCount from "@/components/ViewCount";
+import { recordProfileView } from "@/lib/views-api";
 import Image from "next/image";
 
 interface SocialLink {
@@ -21,6 +23,7 @@ interface Profile {
   theme: string;
   customHtml?: string | null;
   likesCount: number;
+  viewsCount: number;
   profilePicture?: string | null;
 }
 
@@ -37,6 +40,15 @@ export default function ProfilePage() {
         const response = await api.get<Profile>(`/profile/${username}`);
         console.log('Profile data received:', response.data);
         setProfile(response.data);
+        
+        // Record the profile view
+        if (response.data.id) {
+          const updatedViewCount = await recordProfileView(username);
+          // Update the view count if different from initial fetch
+          if (updatedViewCount !== response.data.viewsCount) {
+            setProfile(prev => prev ? {...prev, viewsCount: updatedViewCount} : null);
+          }
+        }
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile");
@@ -88,7 +100,12 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-            <h1 className="text-3xl font-bold">{profile.username}</h1>
+            <div>
+              <h1 className="text-3xl font-bold">{profile.username}</h1>
+              <div className="flex items-center mt-1 space-x-4">
+                <ViewCount count={profile.viewsCount || 0} size="md" />
+              </div>
+            </div>
           </div>
           <LikeButton 
             profileId={profile.id} 

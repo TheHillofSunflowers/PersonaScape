@@ -34,6 +34,8 @@ model Profile {
   User         User    @relation(fields: [userId], references: [id])
   receivedLikes ProfileLike[]
   likesCount    Int    @default(0)
+  viewsCount    Int    @default(0)  // Total number of views
+  receivedViews ProfileView[] // Relation to the viewers
 }
 
 model ProfileLike {
@@ -48,4 +50,21 @@ model ProfileLike {
   
   // Ensure a user can only like a profile once
   @@unique([profileId, userId])
+}
+
+model ProfileView {
+  id          Int      @id @default(autoincrement())
+  profileId   Int      // The profile that was viewed
+  viewerId    Int?     // The user who viewed the profile (null for anonymous)
+  ipAddress   String   // Store IP address for anonymous users
+  userAgent   String?  // Optional browser/device info
+  createdAt   DateTime @default(now()) // When the view occurred
+  lastViewedAt DateTime @default(now()) // Last time this user/IP viewed the profile
+  viewCount   Int      @default(1)    // How many times this user/IP viewed the profile
+  
+  // Define relation
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  
+  // Unique constraint to prevent duplicate views
+  @@unique([profileId, viewerId, ipAddress])
 }
