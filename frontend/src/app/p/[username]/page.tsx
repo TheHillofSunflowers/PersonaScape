@@ -7,16 +7,14 @@ import api from "@/lib/api";
 interface Profile {
   username: string;
   bio: string;
-  hobbies: string[] | null;
+  hobbies: string | null;
   socialLinks: {
     github?: string;
     twitter?: string;
     linkedin?: string;
-  };
-  theme: {
-    backgroundColor: string;
-    textColor: string;
-  };
+  } | null;
+  theme: string;
+  customHtml?: string | null;
 }
 
 export default function ProfilePage() {
@@ -30,12 +28,7 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const response = await api.get<Profile>(`/profile/${username}`);
-        // Ensure hobbies is always an array
-        const profileData = {
-          ...response.data,
-          hobbies: Array.isArray(response.data.hobbies) ? response.data.hobbies : []
-        };
-        setProfile(profileData);
+        setProfile(response.data);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile");
@@ -61,17 +54,20 @@ export default function ProfilePage() {
     return <div>Profile not found</div>;
   }
 
+  // Split hobbies string into array for display
+  const hobbiesArray = profile.hobbies ? profile.hobbies.split(',').map(h => h.trim()) : [];
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold mb-4">{profile.username}</h1>
         <p className="text-gray-600 mb-4">{profile.bio}</p>
         
-        {profile.hobbies && profile.hobbies.length > 0 && (
+        {hobbiesArray.length > 0 && (
           <div className="mb-4">
             <h2 className="text-xl font-semibold mb-2">Hobbies</h2>
             <div className="flex flex-wrap gap-2">
-              {profile.hobbies.map((hobby, index) => (
+              {hobbiesArray.map((hobby, index) => (
                 <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                   {hobby}
                 </span>
@@ -101,6 +97,13 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+        )}
+
+        {profile.customHtml && (
+          <div 
+            className="mt-4"
+            dangerouslySetInnerHTML={{ __html: profile.customHtml }}
+          />
         )}
       </div>
     </div>
