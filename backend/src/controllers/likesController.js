@@ -48,27 +48,50 @@ const likeProfile = async (req, res, next) => {
       return;
     }
 
-    // Create like with Prisma client
-    await prisma.profileLike.create({
-      data: {
-        profileId: profileIdNum,
-        userId: userIdNum
+    try {
+      // Create like with Prisma client
+      await prisma.profileLike.create({
+        data: {
+          profileId: profileIdNum,
+          userId: userIdNum
+        }
+      });
+
+      // Increment the likes count on the profile
+      const updatedProfile = await prisma.profile.update({
+        where: { id: profileIdNum },
+        data: { likesCount: { increment: 1 } }
+      });
+
+      res.status(201).json({ 
+        message: 'Profile liked successfully',
+        likesCount: updatedProfile.likesCount || 1
+      });
+    } catch (dbError) {
+      // If there's an error with likesCount column (P2022)
+      if (dbError.code === 'P2022' && dbError.meta?.column?.includes('likesCount')) {
+        console.log('likesCount column does not exist yet, creating like without updating count');
+        
+        // Just create the like without incrementing a non-existent column
+        await prisma.profileLike.create({
+          data: {
+            profileId: profileIdNum,
+            userId: userIdNum
+          }
+        });
+
+        // Return success with default count
+        res.status(201).json({ 
+          message: 'Profile liked successfully (likesCount not available)',
+          likesCount: 1
+        });
+      } else {
+        throw dbError; // rethrow if it's a different error
       }
-    });
-
-    // Increment the likes count on the profile
-    const updatedProfile = await prisma.profile.update({
-      where: { id: profileIdNum },
-      data: { likesCount: { increment: 1 } }
-    });
-
-    res.status(201).json({ 
-      message: 'Profile liked successfully',
-      likesCount: updatedProfile.likesCount
-    });
+    }
   } catch (err) {
     console.error('Error in likeProfile:', err);
-    next(err);
+    res.status(500).json({ error: 'Failed to like profile' });
   }
 };
 
@@ -114,33 +137,58 @@ const unlikeProfile = async (req, res, next) => {
       return;
     }
 
-    // Delete the like
-    await prisma.profileLike.delete({
-      where: {
-        profileId_userId: {
-          profileId: profileIdNum,
-          userId: userIdNum
+    try {
+      // Delete the like
+      await prisma.profileLike.delete({
+        where: {
+          profileId_userId: {
+            profileId: profileIdNum,
+            userId: userIdNum
+          }
         }
-      }
-    });
+      });
 
-    // Decrement the likes count on the profile
-    const updatedProfile = await prisma.profile.update({
-      where: { id: profileIdNum },
-      data: {
-        likesCount: {
-          decrement: 1
+      // Decrement the likes count on the profile
+      const updatedProfile = await prisma.profile.update({
+        where: { id: profileIdNum },
+        data: {
+          likesCount: {
+            decrement: 1
+          }
         }
-      }
-    });
+      });
 
-    res.json({ 
-      message: 'Profile unliked successfully',
-      likesCount: updatedProfile.likesCount
-    });
+      res.json({ 
+        message: 'Profile unliked successfully',
+        likesCount: updatedProfile.likesCount || 0
+      });
+    } catch (dbError) {
+      // If there's an error with likesCount column (P2022)
+      if (dbError.code === 'P2022' && dbError.meta?.column?.includes('likesCount')) {
+        console.log('likesCount column does not exist yet, unlinking without updating count');
+        
+        // Just delete the like without decrementing a non-existent column
+        await prisma.profileLike.delete({
+          where: {
+            profileId_userId: {
+              profileId: profileIdNum,
+              userId: userIdNum
+            }
+          }
+        });
+
+        // Return success with default count
+        res.json({ 
+          message: 'Profile unliked successfully (likesCount not available)',
+          likesCount: 0
+        });
+      } else {
+        throw dbError; // rethrow if it's a different error
+      }
+    }
   } catch (err) {
     console.error('Error in unlikeProfile:', err);
-    next(err);
+    res.status(500).json({ error: 'Failed to unlike profile' });
   }
 };
 
@@ -162,27 +210,43 @@ const checkLikeStatus = async (req, res, next) => {
     const profileIdNum = parseInt(profileId);
 
     // Check if like exists
-    const existingLike = await prisma.profileLike.findUnique({
-      where: {
-        profileId_userId: {
-          profileId: profileIdNum,
-          userId: userIdNum
+    let hasLiked = false;
+    try {
+      const existingLike = await prisma.profileLike.findUnique({
+        where: {
+          profileId_userId: {
+            profileId: profileIdNum,
+            userId: userIdNum
+          }
         }
-      }
-    });
+      });
+      hasLiked = !!existingLike;
+    } catch (error) {
+      console.log('Error checking like status, assuming ProfileLike table missing:', error);
+      // If table doesn't exist, assume not liked
+      hasLiked = false;
+    }
 
     // Get the profile to check its likes count
-    const profile = await prisma.profile.findUnique({
-      where: { id: profileIdNum }
-    });
+    let likesCount = 0;
+    try {
+      const profile = await prisma.profile.findUnique({
+        where: { id: profileIdNum }
+      });
+      likesCount = profile?.likesCount || 0;
+    } catch (error) {
+      console.log('Error getting likes count, assuming likesCount column missing:', error);
+      // If likesCount doesn't exist, fallback to 0
+      likesCount = 0;
+    }
 
     res.json({
-      hasLiked: !!existingLike,
-      likesCount: profile?.likesCount || 0
+      hasLiked,
+      likesCount
     });
   } catch (err) {
     console.error('Error in checkLikeStatus:', err);
-    next(err);
+    res.status(500).json({ error: 'Failed to check like status' });
   }
 };
 
@@ -227,9 +291,9 @@ const getLikedProfiles = async (req, res, next) => {
       const formattedProfiles = likedProfiles.map(like => ({
         id: like.profile.id,
         userId: like.profile.userId,
-        bio: like.profile.bio,
-        theme: like.profile.theme,
-        likesCount: like.profile.likesCount,
+        bio: like.profile.bio || '',
+        theme: like.profile.theme || 'default',
+        likesCount: like.profile.likesCount || 0,
         username: like.profile.User?.username,
         likedAt: like.createdAt,
         profilePicture: like.profile.profilePicture || null
@@ -240,9 +304,9 @@ const getLikedProfiles = async (req, res, next) => {
       });
     } catch (dbError) {
       // Check if the error is because the table doesn't exist
-      if (dbError.code === 'P2021' && dbError.meta?.table?.includes('ProfileLike')) {
-        console.log('ProfileLike table does not exist yet, returning empty array');
-        // Return empty array if table doesn't exist yet
+      if (dbError.code === 'P2021' || dbError.code === 'P2022') {
+        console.log(`Database structure issue: ${dbError.code} - ${dbError.message}, returning empty array`);
+        // Return empty array if table or column doesn't exist yet
         res.json({
           likedProfiles: []
         });
@@ -252,7 +316,7 @@ const getLikedProfiles = async (req, res, next) => {
     }
   } catch (err) {
     console.error('Error in getLikedProfiles:', err);
-    next(err);
+    res.status(500).json({ error: 'Failed to retrieve liked profiles' });
   }
 };
 
@@ -289,7 +353,7 @@ const getLeaderboard = async (req, res, next) => {
         userId: profile.userId,
         username: profile.User?.username,
         likesCount: profile.likesCount,
-        theme: profile.theme,
+        theme: profile.theme || 'default',
         profilePicture: profile.profilePicture || null
       }));
 
@@ -297,42 +361,13 @@ const getLeaderboard = async (req, res, next) => {
         leaderboard
       });
     } catch (dbError) {
-      // Check if the error is because the column doesn't exist
-      if (dbError.code === 'P2022' && dbError.meta?.column === 'profilePicture') {
-        console.log('profilePicture column does not exist yet, returning leaderboard without it');
+      // Check if the error is because of missing columns
+      if (dbError.code === 'P2022') {
+        console.log(`Column doesn't exist: ${dbError.meta?.column}, returning empty leaderboard`);
         
-        // Retry without expecting the profilePicture column
-        const topProfiles = await prisma.profile.findMany({
-          where: {
-            likesCount: {
-              gt: 0
-            }
-          },
-          include: {
-            User: {
-              select: {
-                username: true
-              }
-            }
-          },
-          orderBy: {
-            likesCount: 'desc'
-          },
-          take: 10 // Limit to top 10
-        });
-
-        // Format the results without profilePicture
-        const leaderboard = topProfiles.map(profile => ({
-          id: profile.id,
-          userId: profile.userId,
-          username: profile.User?.username,
-          likesCount: profile.likesCount,
-          theme: profile.theme,
-          profilePicture: null // Add null as default
-        }));
-
+        // Return empty leaderboard if necessary columns don't exist yet
         res.json({
-          leaderboard
+          leaderboard: []
         });
       } else {
         throw dbError; // rethrow for other errors
@@ -340,7 +375,7 @@ const getLeaderboard = async (req, res, next) => {
     }
   } catch (err) {
     console.error('Error in getLeaderboard:', err);
-    next(err);
+    res.status(500).json({ error: 'Failed to retrieve leaderboard' });
   }
 };
 

@@ -17,32 +17,47 @@ const getProfile = async (req, res, next) => {
       return;
     }
 
-    // Format the profile data
+    // Format the profile data with fallbacks for missing columns
     const profileData = {
-      ...user.profile,
+      id: user.profile?.id,
+      userId: user.profile?.userId,
+      bio: user.profile?.bio || '',
+      hobbies: user.profile?.hobbies || '',
+      socialLinks: user.profile?.socialLinks || {},
+      customHtml: user.profile?.customHtml || '',
+      theme: user.profile?.theme || 'default',
       username: user.username,
-      // Ensure socialLinks is in the correct format
-      socialLinks: user.profile?.socialLinks ? {
-        github: user.profile.socialLinks.github || null,
-        twitter: user.profile.socialLinks.twitter || null,
-        linkedin: user.profile.socialLinks.linkedin || null
-      } : null,
-      // Add default profile picture if the column doesn't exist yet
+      likesCount: user.profile?.likesCount || 0,
       profilePicture: user.profile?.profilePicture || null
     };
 
     console.log('Sending profile data:', profileData);
     res.json(profileData);
-  } catch (err) {
-    console.error('Error in getProfile:', err);
-    // Check if it's a missing column error
-    if (err.code === 'P2022' && err.meta?.column === 'Profile.profilePicture') {
-      console.log('Missing profilePicture column in database, returning profile without it');
+  } catch (error) {
+    console.error('Error in getProfile:', error);
+    
+    // Check if error is due to missing columns
+    if (error.code === 'P2022') {
+      console.log('Missing column in database, returning profile without it');
+      
       try {
-        // Try again without including the profilePicture field
+        // Retry with minimal fields
         const user = await prisma.user.findUnique({
           where: { username },
-          include: { profile: true },
+          select: {
+            username: true,
+            profile: {
+              select: {
+                id: true,
+                userId: true,
+                bio: true,
+                hobbies: true,
+                socialLinks: true,
+                customHtml: true,
+                theme: true,
+              }
+            }
+          }
         });
         
         if (!user) {
@@ -50,24 +65,28 @@ const getProfile = async (req, res, next) => {
           return;
         }
         
+        // Return profile with default values for missing fields
         const profileData = {
-          ...user.profile,
+          id: user.profile?.id,
+          userId: user.profile?.userId,
+          bio: user.profile?.bio || '',
+          hobbies: user.profile?.hobbies || '',
+          socialLinks: user.profile?.socialLinks || {},
+          customHtml: user.profile?.customHtml || '',
+          theme: user.profile?.theme || 'default',
           username: user.username,
-          socialLinks: user.profile?.socialLinks ? {
-            github: user.profile.socialLinks.github || null,
-            twitter: user.profile.socialLinks.twitter || null,
-            linkedin: user.profile.socialLinks.linkedin || null
-          } : null,
-          profilePicture: null // Add default value
+          likesCount: 0,
+          profilePicture: null
         };
         
         res.json(profileData);
-      } catch (retryErr) {
-        console.error('Error in getProfile retry:', retryErr);
-        next(retryErr);
+        return;
+      } catch (retryError) {
+        console.error('Error in getProfile retry:', retryError);
+        res.status(500).json({ error: 'Internal server error' });
       }
     } else {
-      next(err);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };
@@ -122,49 +141,91 @@ const updateProfile = async (req, res, next) => {
     });
 
     if (!userExists) {
-      console.log(`User not found with ID: ${userId}`);
+      console.log('User not found with ID:', userId);
       res.status(404).json({ error: 'User not found' });
       return;
     }
 
     try {
-      // Create update object without profilePicture first (compatible with old schema)
-      const baseUpdateData = { 
-        bio, 
-        hobbies, 
-        socialLinks, 
-        customHtml, 
-        theme
-      };
-      
-      const baseCreateData = {
-        userId: parseInt(userId),
-        ...baseUpdateData
-      };
-      
-      // First try without profilePicture in case column doesn't exist yet
+      // Try with all fields first
       const profile = await prisma.profile.upsert({
         where: { userId: parseInt(userId) },
-        update: baseUpdateData,
-        create: baseCreateData,
+        update: {
+          bio,
+          hobbies,
+          socialLinks,
+          customHtml,
+          theme,
+          profilePicture,
+        },
+        create: {
+          userId: parseInt(userId),
+          bio,
+          hobbies,
+          socialLinks,
+          customHtml,
+          theme,
+          profilePicture,
+          likesCount: 0,
+        },
       });
-
-      console.log('Profile updated successfully:', profile.id);
-      res.json({...profile, profilePicture: null}); // Add profilePicture: null to response
-    } catch (dbError) {
-      console.error('Database error during profile update:', dbError);
-      res.status(500).json({ 
-        error: 'Failed to update profile',
-        details: process.env.NODE_ENV === 'development' ? dbError.message : null 
+      
+      console.log('Profile updated successfully');
+      res.json({
+        ...profile,
+        username: userExists.username
       });
+    } catch (error) {
+      console.log('Database error during profile update:', error);
+      
+      // Check if error is due to missing columns
+      if (error.code === 'P2022') {
+        // Column doesn't exist in database - try without the problematic fields
+        try {
+          const profile = await prisma.profile.upsert({
+            where: { userId: parseInt(userId) },
+            update: {
+              bio,
+              hobbies,
+              socialLinks,
+              customHtml,
+              theme,
+              // Omit profilePicture and likesCount
+            },
+            create: {
+              userId: parseInt(userId),
+              bio,
+              hobbies,
+              socialLinks,
+              customHtml,
+              theme,
+              // Omit profilePicture and likesCount
+            },
+          });
+          
+          console.log('Profile updated successfully (without new columns)');
+          res.json({
+            ...profile,
+            username: userExists.username,
+            profilePicture: null,
+            likesCount: 0,
+          });
+        } catch (fallbackError) {
+          console.error('Error in profile update fallback:', fallbackError);
+          res.status(500).json({ error: 'Failed to update profile', details: null });
+        }
+      } else {
+        res.status(500).json({ error: 'Failed to update profile', details: null });
+      }
     }
   } catch (err) {
-    console.error('Unexpected error in updateProfile:', err);
-    next(err);
+    console.error('Error in updateProfile:', err);
+    res.status(500).json({ error: 'Failed to update profile', details: null });
   }
 };
 
+// Export all controller functions
 module.exports = {
   getProfile,
-  updateProfile
+  updateProfile,
 }; 
