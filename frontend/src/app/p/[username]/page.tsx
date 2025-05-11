@@ -4,15 +4,16 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
 
+interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 interface Profile {
   username: string;
   bio: string;
   hobbies: string | null;
-  socialLinks: {
-    github?: string | null;
-    twitter?: string | null;
-    linkedin?: string | null;
-  } | null;
+  socialLinks: SocialLink[] | null;
   theme: string;
   customHtml?: string | null;
 }
@@ -58,8 +59,8 @@ export default function ProfilePage() {
   // Split hobbies string into array for display
   const hobbiesArray = profile.hobbies ? profile.hobbies.split(',').map(h => h.trim()) : [];
 
-  // Check if there are any non-null social links
-  const hasSocialLinks = profile.socialLinks && Object.values(profile.socialLinks).some(link => link !== null);
+  // Check if there are any social links
+  const hasSocialLinks = profile.socialLinks && profile.socialLinks.length > 0;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -84,21 +85,17 @@ export default function ProfilePage() {
           <div className="mb-4">
             <h2 className="text-xl font-semibold mb-2">Social Links</h2>
             <div className="flex gap-4">
-              {profile.socialLinks?.github && (
-                <a href={profile.socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                  GitHub
+              {profile.socialLinks?.map((link, index) => (
+                <a 
+                  key={index}
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-blue-500 hover:underline"
+                >
+                  {link.platform}
                 </a>
-              )}
-              {profile.socialLinks?.twitter && (
-                <a href={profile.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                  Twitter
-                </a>
-              )}
-              {profile.socialLinks?.linkedin && (
-                <a href={profile.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                  LinkedIn
-                </a>
-              )}
+              ))}
             </div>
           </div>
         )}
