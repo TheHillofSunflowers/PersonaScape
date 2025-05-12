@@ -115,9 +115,9 @@ export default function LikeButton({
       <div className={`flex items-center gap-2 ${className} relative`}>
         <button
           onClick={handleLikeToggle}
-          className={`flex items-center justify-center rounded-full ${sizeClasses[size]} 
-            text-accent-400 dark:text-accent-500 cursor-default`}
+          className={`flex items-center justify-center rounded-full ${sizeClasses[size]} text-brand-300 dark:text-brand-500 cursor-default bg-brand-100 dark:bg-brand-800`}
           aria-label="Cannot like your own profile"
+          disabled
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
             <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
@@ -125,13 +125,13 @@ export default function LikeButton({
         </button>
         
         {showCount && (
-          <span className="text-accent-700 dark:text-accent-300 font-medium">{likesCount}</span>
+          <span className="text-brand-700 dark:text-brand-200 font-medium">{likesCount}</span>
         )}
         
         {showTooltip && (
-          <div className="absolute top-full right-0 mt-2 bg-accent-800 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap z-10 shadow-soft">
+          <div className="absolute top-full right-0 mt-2 bg-brand-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap z-10 shadow-soft">
             You cannot like your own profile
-            <div className="absolute -top-1 right-2 w-2 h-2 bg-accent-800 rotate-45"></div>
+            <div className="absolute -top-1 right-2 w-2 h-2 bg-brand-900 rotate-45"></div>
           </div>
         )}
       </div>
@@ -143,11 +143,11 @@ export default function LikeButton({
       <button
         onClick={handleLikeToggle}
         disabled={isLoading || !isAuthenticated}
-        className={`flex items-center justify-center rounded-full transition-all ${sizeClasses[size]} 
-          ${liked 
-            ? 'text-secondary-700 dark:text-secondary-400 scale-110 hover:text-secondary-800 dark:hover:text-secondary-300' 
-            : 'text-accent-600 dark:text-accent-400 hover:text-secondary-600 dark:hover:text-secondary-400 hover:scale-110'
-          } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+        className={`flex items-center justify-center rounded-full transition-all ${sizeClasses[size]}
+          ${liked
+            ? 'bg-accent-100 dark:bg-accent-800 text-accent-600 dark:text-accent-400 scale-110 shadow-button hover:bg-accent-200 dark:hover:bg-accent-700'
+            : 'bg-brand-100 dark:bg-brand-800 text-brand-500 dark:text-brand-300 hover:bg-accent-100 dark:hover:bg-accent-700 hover:scale-110'}
+          ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         aria-label={liked ? 'Unlike profile' : 'Like profile'}
       >
         {isLoading ? (
@@ -156,11 +156,11 @@ export default function LikeButton({
           </svg>
         ) : (
           liked ? (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 transition-all duration-150">
               <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 transition-all duration-150">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </svg>
           )
@@ -168,11 +168,11 @@ export default function LikeButton({
       </button>
       
       {showCount && (
-        <span className="text-accent-700 dark:text-accent-300 font-medium">{likesCount}</span>
+        <span className="text-brand-700 dark:text-brand-200 font-medium">{likesCount}</span>
       )}
       
       {error && (
-        <span className="text-red-600 text-xs ml-2">{error}</span>
+        <span className="text-danger-600 text-xs ml-2">{error}</span>
       )}
     </div>
   );

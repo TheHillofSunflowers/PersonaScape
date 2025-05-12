@@ -89,8 +89,7 @@ export default function Comment({
   };
   
   return (
-    <div className={`relative p-5 ${isReply ? 'ml-10 mt-3' : 'border-b border-accent-300 dark:border-accent-700'} 
-      bg-accent-100 dark:bg-accent-700 rounded-xl transition-all ${!isReply && 'shadow-soft'} hover:shadow-lg`}>
+    <div className={`relative p-5 ${isReply ? 'ml-10 mt-3' : 'mb-2'} card transition-all ${!isReply && 'shadow-card'} hover:shadow-lg`}>
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           {comment.user.profile?.profilePicture ? (
@@ -107,27 +106,23 @@ export default function Comment({
             </div>
           )}
         </div>
-        
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-center mb-2">
-            <p className="text-sm font-medium text-accent-900 dark:text-white">
+            <p className="text-sm font-semibold text-brand-900 dark:text-brand-50">
               {comment.user.username}
             </p>
-            <span className="text-xs text-accent-700 dark:text-accent-300">
+            <span className="text-xs text-brand-500 dark:text-brand-300">
               {formatRelativeTime(comment.createdAt)}
             </span>
           </div>
-          
-          <p className="text-accent-800 dark:text-accent-100 break-words leading-relaxed">
+          <p className="text-brand-800 dark:text-brand-100 break-words leading-relaxed">
             {comment.content}
           </p>
-          
           <div className="mt-3 flex items-center space-x-4 pt-1">
             <button
               onClick={handleLike}
-              className={`text-xs flex items-center transition-colors cursor-pointer ${
-                liked ? 'text-secondary-700 dark:text-secondary-400' : 'text-accent-700 dark:text-accent-300 hover:text-secondary-600 dark:hover:text-secondary-400'
-              }`}
+              className={`text-xs flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 ${
+                liked ? 'text-accent-600 dark:text-accent-400' : 'text-brand-700 dark:text-brand-200'} cursor-pointer`}
             >
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -140,11 +135,10 @@ export default function Comment({
               </svg>
               {likesCount > 0 && <span className="font-medium">{likesCount}</span>}
             </button>
-            
             {!isReply && (
               <button 
                 onClick={() => onReply(comment.id)}
-                className="text-xs text-accent-700 dark:text-accent-300 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors cursor-pointer"
+                className="text-xs text-brand-700 dark:text-brand-200 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
@@ -152,22 +146,20 @@ export default function Comment({
                 Reply
               </button>
             )}
-            
             {isAuthor && (
               <>
                 <button 
                   onClick={() => onEdit(comment)}
-                  className="text-xs text-accent-700 dark:text-accent-300 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors cursor-pointer"
+                  className="text-xs text-brand-700 dark:text-brand-200 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   Edit
                 </button>
-                
                 <button 
                   onClick={handleDelete}
-                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 flex items-center transition-colors cursor-pointer"
+                  className="text-xs text-danger-600 dark:text-danger-400 hover:text-danger-700 dark:hover:text-danger-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-danger-100 dark:hover:bg-danger-900 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -177,12 +169,11 @@ export default function Comment({
               </>
             )}
           </div>
-          
           {!isReply && hasReplies && (
-            <div className="mt-4 pt-2 border-t border-accent-200 dark:border-accent-600">
+            <div className="mt-4 pt-2 border-t border-brand-100 dark:border-brand-700">
               <button 
                 onClick={toggleReplies}
-                className="text-xs text-primary-700 dark:text-primary-300 hover:text-primary-800 dark:hover:text-primary-200 font-medium flex items-center transition-colors cursor-pointer"
+                className="text-xs text-primary-700 dark:text-primary-300 hover:text-primary-800 dark:hover:text-primary-200 font-medium flex items-center transition-colors rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -195,7 +186,6 @@ export default function Comment({
                 </svg>
                 {showReplies ? 'Hide' : 'Show'} {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
               </button>
-              
               {showReplies && comment.replies && (
                 <div className="mt-3 space-y-3 animate-fade-in">
                   {comment.replies.map((reply) => (

@@ -14,16 +14,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-accent-100 dark:bg-accent-900">
+      <body className="min-h-screen bg-brand-50 dark:bg-brand-900 text-brand-900 dark:text-brand-50 transition-colors">
         <AuthProvider>
           <Navbar />
-          <main className="container mx-auto px-4 py-6 max-w-7xl animate-fade-in">
-            {children}
-          </main>
-          <footer className="py-6 mt-12 bg-accent-200 dark:bg-accent-800 shadow-soft border-t border-accent-300 dark:border-accent-700">
-            <div className="container mx-auto px-4 text-center text-accent-700 dark:text-accent-400 text-sm">
-              <p>© {new Date().getFullYear()} PersonaScape. All rights reserved.</p>
+          <main className="container mx-auto px-4 py-10 max-w-5xl">
+            <div className="card p-8 md:p-10 mt-8 mb-16 animate-fade-in">
+              {children}
             </div>
+          </main>
+          <footer className="py-6 bg-transparent border-t border-brand-200 dark:border-brand-800 text-center text-brand-500 dark:text-brand-400 text-sm">
+            <p>© {new Date().getFullYear()} PersonaScape. All rights reserved.</p>
           </footer>
         </AuthProvider>
       </body>

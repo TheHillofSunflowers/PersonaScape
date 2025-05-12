@@ -1,71 +1,124 @@
 @import "tailwindcss";
 
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  /* Theme colors */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  
-  --color-secondary-500: #d946ef;
-  --color-secondary-600: #c026d3;
-  
-  --color-accent-200: #e2e8f0;
-  --color-accent-300: #cbd5e1;
-  --color-accent-600: #475569;
-  --color-accent-700: #334155;
-  --color-accent-800: #1e293b;
-  
-  /* Spacing */
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  --background-light: #f8fafc;
+  --background-dark: #181926;
+  --foreground-light: #181926;
+  --foreground-dark: #f8fafc;
+  --card-bg-light: #fff;
+  --card-bg-dark: #23243a;
+  --border-light: #e2e8f0;
+  --border-dark: #23243a;
+  --brand: #6366f1;
+  --radius: 1rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--background-light);
+  color: var(--foreground-light);
+  scroll-behavior: smooth;
+  min-height: 100%;
+}
+
+body {
+  background: var(--background-light);
+  color: var(--foreground-light);
+  min-height: 100vh;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  transition: background 0.3s, color 0.3s;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
+  html, body {
+    background: var(--background-dark);
+    color: var(--foreground-dark);
   }
 }
 
-/* Base styles */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-weight: 600;
-  line-height: 1.2;
+::-webkit-scrollbar {
+  width: 10px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 8px;
+  border: 2px solid #f8fafc;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
+}
+
+::selection {
+  background: #a5b4fc;
+  color: #181926;
+}
+
+:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+button, [role="button"], .cursor-pointer {
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+a {
+  color: #6366f1;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover, a:focus {
+  color: #4338ca;
+  text-decoration: underline;
+}
+
+.card {
+  background: var(--card-bg-light);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+  border: 1px solid var(--border-light);
+  transition: box-shadow 0.2s, border 0.2s;
+}
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: var(--card-bg-dark);
+    border: 1px solid var(--border-dark);
+  }
+}
+
+input, textarea, select {
+  background: #f1f5f9;
+  color: #181926;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px #a5b4fc33;
+}
+@media (prefers-color-scheme: dark) {
+  input, textarea, select {
+    background: #23243a;
+    color: #f8fafc;
+    border: 1px solid #23243a;
+  }
 }
 
 /* Animation classes */
