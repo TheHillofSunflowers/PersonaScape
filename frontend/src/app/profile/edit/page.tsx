@@ -210,75 +210,34 @@ export default function EditProfilePage() {
     setIsUploadingBackground(true);
     
     try {
-      // Create form data for the upload
+      // Use ImgBB for background images just like profile pictures
+      // This ensures they persist even when the server restarts
       const formData = new FormData();
-      formData.append('backgroundImage', file);
+      formData.append('image', file);
       
-      // Upload to our backend
-      const response = await api.post('/api/profile/upload-background', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      // Using ImgBB as the image hosting service
+      // Get API key from environment variable or use a fallback
+      const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY || '8b694df8ad4f44e950e115166611eb7e';
+      formData.append('key', imgbbApiKey);
+      
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData,
       });
       
-      console.log('Background image upload response:', response.data);
-      
-      // Check for backgroundImage URL in the response
-      if (response.data && response.data.backgroundImage) {
-        return response.data.backgroundImage;
+      if (!response.ok) {
+        console.error('ImgBB API error:', response.status, response.statusText);
+        throw new Error(`Failed to upload background image: ${response.status} ${response.statusText}`);
       }
       
-      // Try to find any image URL in the response
-      if (response.data) {
-        // Check in nested 'profile' object
-        if (response.data.profile && response.data.profile.backgroundImage) {
-          return response.data.profile.backgroundImage;
-        }
-        
-        // Check for any property that looks like an image URL
-        for (const key in response.data) {
-          const value = response.data[key];
-          if (typeof value === 'string' && 
-              (value.includes('/uploads/') || 
-               value.includes('.png') || 
-               value.includes('.jpg') || 
-               value.includes('.jpeg'))) {
-            console.log(`Found image URL in response.${key}:`, value);
-            return value;
-          }
-        }
-        
-        // Recursively check nested objects
-        const findImageUrl = (obj: Record<string, unknown>): string | null => {
-          if (!obj || typeof obj !== 'object') return null;
-          
-          for (const key in obj) {
-            const value = obj[key];
-            
-            // Check if this property is an image URL
-            if (typeof value === 'string' && 
-                (value.includes('/uploads/') || 
-                 value.includes('.png') || 
-                 value.includes('.jpg') || 
-                 value.includes('.jpeg'))) {
-              return value;
-            }
-            
-            // Recursively check nested objects
-            if (value && typeof value === 'object') {
-              const nestedUrl = findImageUrl(value as Record<string, unknown>);
-              if (nestedUrl) return nestedUrl;
-            }
-          }
-          
-          return null;
-        };
-        
-        const foundUrl = findImageUrl(response.data);
-        if (foundUrl) return foundUrl;
-      }
+      const data = await response.json();
       
-      throw new Error('Failed to upload background image: Invalid response format');
+      if (data.success) {
+        return data.data.url;
+      } else {
+        console.error('ImgBB upload failed:', data);
+        throw new Error(data.error?.message || 'Failed to upload background image');
+      }
     } catch (error) {
       console.error('Error uploading background image:', error);
       throw error;
@@ -525,6 +484,14 @@ export default function EditProfilePage() {
                     )}
                   </div>
                 </div>
+                
+                {/* Show notice about background image storage change if they have a background image on the old system */}
+                {profile.backgroundImage && profile.backgroundImage.includes('personascape.onrender.com/uploads') && (
+                  <div className="mt-2 p-2 bg-blue-900/30 border border-blue-700 rounded text-sm text-blue-300">
+                    <p>We've improved our image storage! You'll need to re-upload your background image. 
+                    This will ensure it remains available even when the server restarts.</p>
+                  </div>
+                )}
                 
                 <div className="space-y-4">
                   <div>

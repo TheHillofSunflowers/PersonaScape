@@ -7,7 +7,7 @@ import LikeButton from "@/components/LikeButton";
 import ViewCount from "@/components/ViewCount";
 import CommentSection from "@/components/CommentSection";
 import { recordProfileView } from "@/lib/views-api";
-import { getBackgroundImageStyle } from "@/lib/imageUtils";
+import { getBackgroundImageStyle, getImageUrl } from "@/lib/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -237,7 +237,7 @@ export default function ProfilePage() {
       {profile.backgroundImage && (
         <div className="fixed inset-0 z-0">
           <img 
-            src={profile.backgroundImage}
+            src={getImageUrl(profile.backgroundImage)}
             alt="Background"
             className="absolute inset-0 w-full h-full object-cover opacity-75"
             crossOrigin="anonymous"
