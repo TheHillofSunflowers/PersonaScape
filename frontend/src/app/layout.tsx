@@ -14,15 +14,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-brand-50 dark:bg-brand-900 text-brand-900 dark:text-brand-50 transition-colors">
+      <body className="min-h-screen bg-[#16171d] text-white">
         <AuthProvider>
           <Navbar />
-          <main className="container mx-auto px-4 py-10 max-w-5xl">
-            <div className="card p-8 md:p-10 mt-8 mb-16 animate-fade-in">
-              {children}
-            </div>
+          <main className="container mx-auto px-4 py-8">
+            {children}
           </main>
-          <footer className="py-6 bg-transparent border-t border-brand-200 dark:border-brand-800 text-center text-brand-500 dark:text-brand-400 text-sm">
+          <footer className="py-6 bg-[#1e1f27] border-t border-[#32333c] text-center text-gray-400 text-sm">
             <p>© {new Date().getFullYear()} PersonaScape. All rights reserved.</p>
           </footer>
         </AuthProvider>
