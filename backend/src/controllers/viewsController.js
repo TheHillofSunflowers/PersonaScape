@@ -6,21 +6,48 @@ const prisma = require('../prismaClient');
  */
 const recordProfileView = async (req, res, next) => {
   try {
-    const { username } = req.params;
+    let { username } = req.params;
     const userId = req.userId || null; // Authenticated user ID or null for anonymous
     const ipAddress = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     const userAgent = req.headers['user-agent'] || null;
     
-    // Find the user by username
-    const user = await prisma.user.findUnique({
+    console.log(`Recording view for profile username: "${username}"`);
+    
+    // Find the user by username - try exact match first
+    let user = await prisma.user.findUnique({
       where: { username },
       include: { profile: true },
     });
 
+    // If not found, try with trimmed username (no trailing spaces)
+    if (!user && username.trim() !== username) {
+      const trimmedUsername = username.trim();
+      console.log(`User not found with exact username, trying trimmed: "${trimmedUsername}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: trimmedUsername },
+        include: { profile: true },
+      });
+    }
+    
+    // If still not found, try adding a trailing space
+    if (!user && !username.endsWith(' ')) {
+      const usernameWithSpace = username + ' ';
+      console.log(`User not found, trying with trailing space: "${usernameWithSpace}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: usernameWithSpace },
+        include: { profile: true },
+      });
+    }
+
     if (!user || !user.profile) {
+      console.log(`Profile not found for any variation of: "${username}"`);
       return res.status(404).json({ error: 'Profile not found' });
     }
 
+    // Use the actual username from the database for subsequent operations
+    username = user.username;
     const profileId = user.profile.id;
     
     // Don't count views of your own profile
@@ -141,18 +168,46 @@ const recordProfileView = async (req, res, next) => {
  */
 const getProfileViewStats = async (req, res, next) => {
   try {
-    const { username } = req.params;
+    let { username } = req.params;
     const userId = req.userId;
 
-    // Find the user by username
-    const user = await prisma.user.findUnique({
+    console.log(`Getting view stats for profile username: "${username}"`);
+    
+    // Find the user by username - try exact match first
+    let user = await prisma.user.findUnique({
       where: { username },
       include: { profile: true },
     });
 
+    // If not found, try with trimmed username (no trailing spaces)
+    if (!user && username.trim() !== username) {
+      const trimmedUsername = username.trim();
+      console.log(`User not found with exact username, trying trimmed: "${trimmedUsername}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: trimmedUsername },
+        include: { profile: true },
+      });
+    }
+    
+    // If still not found, try adding a trailing space
+    if (!user && !username.endsWith(' ')) {
+      const usernameWithSpace = username + ' ';
+      console.log(`User not found, trying with trailing space: "${usernameWithSpace}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: usernameWithSpace },
+        include: { profile: true },
+      });
+    }
+
     if (!user || !user.profile) {
+      console.log(`Profile not found for any variation of: "${username}"`);
       return res.status(404).json({ error: 'Profile not found' });
     }
+
+    // Use the actual username from the database for subsequent operations
+    username = user.username;
 
     // Only allow the profile owner to see detailed stats
     const isOwner = userId && user.id === parseInt(userId);

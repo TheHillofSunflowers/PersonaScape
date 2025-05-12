@@ -50,23 +50,64 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Ensure the username is properly decoded from the URL
-        const decodedUsername = decodeURIComponent(username);
+        // Make sure the username is properly decoded from the URL
+        // The username might already be decoded by Next.js, but we'll ensure it's handled correctly
+        let decodedUsername = username;
         
-        const response = await api.get<Profile>(`/profile/${decodedUsername}`);
-        console.log('Profile data received:', response.data);
-        setProfile(response.data);
+        // If the username contains %20 (encoded space), decode it
+        if (username.includes('%20')) {
+          decodedUsername = decodeURIComponent(username);
+        }
         
-        // Record the profile view
-        if (response.data.id) {
-          const updatedViewCount = await recordProfileView(decodedUsername);
-          // Update the view count if different from initial fetch
-          if (updatedViewCount !== response.data.viewsCount) {
-            setProfile(prev => prev ? {...prev, viewsCount: updatedViewCount} : null);
+        console.log('Fetching profile for username:', decodedUsername, 'Original param:', username);
+        
+        try {
+          const response = await api.get<Profile>(`/profile/${decodedUsername}`);
+          console.log('Profile data received:', response.data);
+          setProfile(response.data);
+          
+          // Record the profile view
+          if (response.data.id) {
+            const updatedViewCount = await recordProfileView(decodedUsername);
+            // Update the view count if different from initial fetch
+            if (updatedViewCount !== response.data.viewsCount) {
+              setProfile(prev => prev ? {...prev, viewsCount: updatedViewCount} : null);
+            }
+          }
+        } catch (error) {
+          // First attempt failed, try with a trailing space if there isn't one
+          // or without a trailing space if there is one
+          console.log('First attempt failed, trying alternative username formats...');
+          
+          let alternativeUsername;
+          if (decodedUsername.endsWith(' ')) {
+            alternativeUsername = decodedUsername.trimEnd(); // Try without trailing spaces
+            console.log('Trying without trailing spaces:', alternativeUsername);
+          } else {
+            alternativeUsername = decodedUsername + ' '; // Try with trailing space
+            console.log('Trying with trailing space:', alternativeUsername);
+          }
+          
+          try {
+            const response = await api.get<Profile>(`/profile/${alternativeUsername}`);
+            console.log('Profile found with alternative format:', response.data);
+            setProfile(response.data);
+            
+            // Record the profile view
+            if (response.data.id) {
+              const updatedViewCount = await recordProfileView(alternativeUsername);
+              if (updatedViewCount !== response.data.viewsCount) {
+                setProfile(prev => prev ? {...prev, viewsCount: updatedViewCount} : null);
+              }
+            }
+          } catch (secondError) {
+            // Both attempts failed
+            console.error("Error fetching profile with both formats:", secondError);
+            setError("Failed to load profile");
           }
         }
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error("Error in profile fetch logic:", err);
         setError("Failed to load profile");
       } finally {
         setLoading(false);

@@ -63,8 +63,20 @@ export function getImageProps(url: string | null | undefined): {
 /**
  * Safely encodes a username for use in URLs
  * Preserves spaces and special characters by properly encoding them
+ * Avoids double-encoding already encoded strings
  */
 export function encodeUsername(username: string): string {
-  // Use encodeURIComponent to safely encode all special characters
+  // If the string already contains encoded characters (like %20),
+  // assume it's already encoded and return it as is
+  if (username.includes('%')) {
+    return username;
+  }
+  
+  // Preserve trailing spaces by explicitly encoding them
+  if (username.endsWith(' ')) {
+    return username.slice(0, -1) + '%20';
+  }
+  
+  // Use encodeURIComponent for all other cases
   return encodeURIComponent(username);
 } 

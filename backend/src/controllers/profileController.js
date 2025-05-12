@@ -2,17 +2,41 @@ const prisma = require('../prismaClient');
 
 // GET /profile/:username
 const getProfile = async (req, res, next) => {
-  const { username } = req.params;
+  let { username } = req.params;
+  
   try {
-    console.log(`Getting profile for username: ${username}`);
+    console.log(`Getting profile for username: "${username}"`);
     
-    const user = await prisma.user.findUnique({
+    // Try exact match first
+    let user = await prisma.user.findUnique({
       where: { username },
       include: { profile: true },
     });
 
+    // If not found, try with trimmed username (no trailing spaces)
+    if (!user && username.trim() !== username) {
+      const trimmedUsername = username.trim();
+      console.log(`User not found with exact username, trying trimmed: "${trimmedUsername}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: trimmedUsername },
+        include: { profile: true },
+      });
+    }
+    
+    // If still not found, try adding a trailing space
+    if (!user && !username.endsWith(' ')) {
+      const usernameWithSpace = username + ' ';
+      console.log(`User not found, trying with trailing space: "${usernameWithSpace}"`);
+      
+      user = await prisma.user.findUnique({
+        where: { username: usernameWithSpace },
+        include: { profile: true },
+      });
+    }
+
     if (!user) {
-      console.log(`User not found: ${username}`);
+      console.log(`User not found for any variation of: "${username}"`);
       res.status(404).json({ error: 'Profile not found' });
       return;
     }

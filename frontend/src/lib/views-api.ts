@@ -31,8 +31,11 @@ export interface LeaderboardProfile {
  */
 export async function recordProfileView(username: string): Promise<number> {
   try {
+    // Don't re-encode if the username already has URL encoding
+    const encodedUsername = username.includes('%20') ? username : encodeUsername(username);
+    
     const response = await api.post<ViewsResponse>(
-      `/views/profile/${encodeUsername(username)}`
+      `/views/profile/${encodedUsername}`
     );
     return response.data.viewsCount;
   } catch (error) {
@@ -46,7 +49,10 @@ export async function recordProfileView(username: string): Promise<number> {
  */
 export async function getProfileViewStats(username: string): Promise<ViewStats> {
   try {
-    const response = await api.get<ViewStats>(`/views/profile/${encodeUsername(username)}/stats`);
+    // Don't re-encode if the username already has URL encoding
+    const encodedUsername = username.includes('%20') ? username : encodeUsername(username);
+    
+    const response = await api.get<ViewStats>(`/views/profile/${encodedUsername}/stats`);
     return response.data;
   } catch (error) {
     console.error('Error getting profile view stats:', error);
