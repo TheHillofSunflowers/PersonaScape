@@ -1,63 +1,154 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="p-4 bg-gray-100 flex justify-between items-center shadow-sm">
-      <div className="text-xl font-bold text-blue-800">
-        <Link href="/">PersonaScape</Link>
-      </div>
-      
-      <div className="flex items-center space-x-6">
-        <Link 
-          href="/leaderboard" 
-          className="text-gray-700 hover:text-blue-600 transition-colors"
-        >
-          Leaderboard
-        </Link>
-        {user ? (
-          <>
+    <nav className="sticky top-0 z-50 bg-white dark:bg-accent-800 shadow-soft backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border-b border-accent-200 dark:border-accent-700">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          {/* Logo and brand */}
+          <div className="flex items-center">
             <Link 
-              href="/dashboard" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              href="/" 
+              className="flex items-center"
             >
-              Dashboard
+              <span className="text-2xl font-heading font-bold bg-gradient-to-r from-primary-600 to-secondary-600 text-transparent bg-clip-text">
+                PersonaScape
+              </span>
             </Link>
+          </div>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
             <Link 
-              href={`/p/${user.username}`}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              href="/leaderboard" 
+              className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
             >
-              My Profile
+              Leaderboard
             </Link>
+            
+            {user ? (
+              <>
+                <Link 
+                  href="/dashboard" 
+                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href={`/p/${user.username}`}
+                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                >
+                  My Profile
+                </Link>
+                <button
+                  onClick={logout}
+                  className="ml-2 px-4 py-2 bg-accent-100 dark:bg-accent-700 text-accent-700 dark:text-accent-200 hover:bg-accent-200 dark:hover:bg-accent-600 rounded-md transition-colors"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                >
+                  Log In
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="ml-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors shadow-button"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
             <button
-              onClick={logout}
-              className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-md text-accent-500 hover:text-accent-700 dark:text-accent-300 dark:hover:text-accent-100 focus:outline-none"
             >
-              Log Out
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
-          </>
-        ) : (
-          <>
-            <Link 
-              href="/login" 
-              className="text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link 
-              href="/signup" 
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-            >
-              Sign Up
-            </Link>
-          </>
-        )}
+          </div>
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden animate-slide-up">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-accent-800 border-t border-accent-200 dark:border-accent-700">
+            <Link 
+              href="/leaderboard" 
+              className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Leaderboard
+            </Link>
+            
+            {user ? (
+              <>
+                <Link 
+                  href="/dashboard" 
+                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href={`/p/${user.username}`}
+                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  My Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Log In
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="block px-3 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

@@ -170,43 +170,43 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
   };
   
   return (
-    <div className="mt-8 space-y-6">
-      <h2 className="text-2xl font-bold mb-4 dark:text-white">Comments</h2>
+    <div className="mt-12 space-y-6">
+      <h2 className="text-2xl font-heading font-bold mb-6 text-accent-800 dark:text-white">Comments</h2>
       
       {user ? (
-        <div className="mb-6">
+        <div className="mb-8">
           <CommentForm 
             profileId={profileId} 
             onSubmit={handleCreateComment} 
           />
         </div>
       ) : (
-        <div className="p-4 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
-          <p className="text-gray-700 dark:text-gray-300">
-            Please <a href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">log in</a> to leave a comment.
+        <div className="p-6 mb-8 bg-accent-50 dark:bg-accent-800 rounded-xl shadow-soft text-center">
+          <p className="text-accent-600 dark:text-accent-300">
+            Please <a href="/login" className="text-primary-600 dark:text-primary-400 hover:underline font-medium">log in</a> to leave a comment.
           </p>
         </div>
       )}
       
       {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+        <div className="p-5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 rounded-xl shadow-soft">
           {error}
         </div>
       )}
       
       {loading && page === 1 ? (
-        <div className="text-center p-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Loading comments...</p>
+        <div className="text-center p-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-primary-500 mx-auto"></div>
+          <p className="mt-4 text-accent-500 dark:text-accent-400">Loading comments...</p>
         </div>
       ) : (
         <>
           {comments.length === 0 ? (
-            <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-gray-600 dark:text-gray-400">No comments yet. Be the first to comment!</p>
+            <div className="text-center p-8 bg-accent-50 dark:bg-accent-800 rounded-xl shadow-soft">
+              <p className="text-accent-500 dark:text-accent-400">No comments yet. Be the first to comment!</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {comments.map(comment => (
                 <React.Fragment key={comment.id}>
                   <Comment
@@ -218,9 +218,9 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
                   />
                   
                   {replyToId === comment.id && (
-                    <div className="ml-12 mt-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        Replying to <span className="font-bold">{comment.user.username}</span>
+                    <div className="ml-14 mt-3">
+                      <p className="text-sm text-accent-500 dark:text-accent-400 mb-3">
+                        Replying to <span className="font-medium text-primary-600 dark:text-primary-400">{comment.user.username}</span>
                       </p>
                       <CommentForm
                         profileId={profileId}
@@ -235,15 +235,15 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
               
               {loading && page > 1 && (
                 <div className="text-center p-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-t-2 border-primary-500 mx-auto"></div>
                 </div>
               )}
               
               {hasMore && !loading && (
-                <div className="text-center pt-2">
+                <div className="text-center pt-4">
                   <button
                     onClick={handleLoadMore}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-300 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-blue-400 dark:border-gray-700 dark:hover:bg-gray-700"
+                    className="px-5 py-2 text-sm font-medium text-primary-600 bg-white dark:bg-accent-800 border border-primary-200 dark:border-accent-700 rounded-md hover:bg-primary-50 dark:hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors shadow-button"
                   >
                     Load More Comments
                   </button>
@@ -255,14 +255,15 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
       )}
       
       {editComment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4 dark:text-white">Edit Comment</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-accent-800 rounded-xl shadow-soft p-6 w-full max-w-lg animate-fade-in">
+            <h3 className="text-xl font-heading font-bold mb-4 text-accent-800 dark:text-white">Edit Comment</h3>
             <CommentForm
               profileId={profileId}
-              editComment={editComment}
+              initialValue={editComment.content}
               onSubmit={handleUpdateComment}
               onCancel={handleCancelEdit}
+              isEdit={true}
             />
           </div>
         </div>
