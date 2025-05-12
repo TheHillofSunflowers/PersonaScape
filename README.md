@@ -8,13 +8,17 @@ A full-stack web application that lets users create **customizable, shareable pr
 
 ✅ **User Authentication** (Sign up & log in with hashed passwords)
 ✅ **Shareable Profile Pages** (Unique URL per user)
-✅ **Profile Customization** (Bio, hobbies, social links, themes)
+✅ **Profile Customization** (Bio, hobbies, social links)
 ✅ **Profile Pictures** (Upload and display user avatars)
+✅ **Background Images** (Personalize your profile with custom backgrounds)
+✅ **Theme Selector** (Choose from multiple theme options: Default, Dark, Minimal, Colorful)  
+✅ **Markdown Support** (Format your bio with Markdown, including GFM)
 ✅ **Like/Rating System** (Like other users' profiles)
 ✅ **Leaderboard** (View most popular profiles) 
 ✅ **Authorization** (Only the owner can edit their page)
 ✅ **Mobile-Friendly & Responsive Design** (Tailwind CSS)
-✅ **Comment System** (Leave comments on profiles with nested replies)
+✅ **Comment System** (Leave comments on profiles with nested replies and likes)
+✅ **Custom HTML** (Advanced users can add custom HTML to their profiles)
 
 ---
 
@@ -28,9 +32,10 @@ A full-stack web application that lets users create **customizable, shareable pr
 | ORM             | Prisma                 |
 | Database        | PostgreSQL             |
 | Auth            | JWT + bcrypt           |
-| File Storage    | Local/Cloud Storage    |
-| Deployment (FE) | Vercel (free plan)     |
-| Deployment (BE) | Render (free plan)     |
+| File Storage    | Local + ImgBB (profile pictures) |
+| Markdown        | React-Markdown + remark-gfm |
+| Deployment (FE) | Vercel                 |
+| Deployment (BE) | Render                 |
 
 ---
 
@@ -40,20 +45,24 @@ A full-stack web application that lets users create **customizable, shareable pr
 /PersonaScape
 ├── /backend
 │    ├── prisma/
+│    │    ├── schema.prisma  
+│    │    └── migrations/
 │    ├── src/
-│    │    ├── index.js
-│    │    ├── routes/
-│    │    ├── controllers/
-│    │    └── middleware/
+│    │    ├── index.js       # Main app entry
+│    │    ├── routes/        # API endpoints
+│    │    ├── controllers/   # Business logic
+│    │    ├── middleware/    # Auth, upload handlers
+│    │    └── prismaClient.js
+│    ├── public/uploads/     # Background image storage
 │    ├── .env
 │    └── package.json
 ├── /frontend
 │    ├── src/
-│    │    ├── app/
-│    │    ├── components/
-│    │    ├── context/
-│    │    ├── hooks/
-│    │    └── lib/
+│    │    ├── app/           # Next.js 14 app router
+│    │    ├── components/    # Shared UI components
+│    │    ├── context/       # Auth context
+│    │    ├── hooks/         # Custom hooks
+│    │    └── lib/           # Utils (API, image, theme)
 │    ├── public/
 │    └── tailwind.config.js
 ├── README.md
@@ -70,14 +79,16 @@ A full-stack web application that lets users create **customizable, shareable pr
 | ------ | -------------- | -------------------- |
 | POST   | `/auth/signup` | Register new user    |
 | POST   | `/auth/login`  | Log in (returns JWT) |
+| GET    | `/auth/me`     | Get current user info |
 
 ### 👤 Profile
 
-| Method | Endpoint             | Description                        |
-| ------ | -------------------- | ---------------------------------- |
-| GET    | `/profile/:username` | Fetch public profile               |
-| PUT    | `/profile/`          | Update own profile (auth required) |
-| POST   | `/profile/upload`    | Upload profile picture             |
+| Method | Endpoint                     | Description                          |
+| ------ | ---------------------------- | ------------------------------------ |
+| GET    | `/profile/:username`         | Fetch public profile                 |
+| PUT    | `/profile/`                  | Update own profile (auth required)   |
+| POST   | `/profile/upload`            | Upload profile picture               |
+| POST   | `/profile/upload-background` | Upload background image              |
 
 ### 👍 Likes
 
@@ -85,6 +96,7 @@ A full-stack web application that lets users create **customizable, shareable pr
 | ------ | -------------------------- | ------------------------------------- |
 | POST   | `/likes/profile/:username` | Like/unlike a profile                 |
 | GET    | `/likes/leaderboard`       | Get most liked profiles               |
+| GET    | `/likes/user`              | Get profiles liked by current user    |
 | GET    | `/likes/profile/:username` | Check if current user liked a profile |
 
 ### 💬 Comments
@@ -92,12 +104,10 @@ A full-stack web application that lets users create **customizable, shareable pr
 | Method | Endpoint                 | Description                                |
 | ------ | ------------------------ | ------------------------------------------ |
 | GET    | `/comments/profile/:id`  | Get comments for a profile (paginated)     |
-| GET    | `/comments/:id`          | Get a specific comment with replies        |
 | POST   | `/comments`              | Create a new comment/reply (auth required) |
 | PUT    | `/comments/:id`          | Update a comment (auth required)           |
 | DELETE | `/comments/:id`          | Delete a comment (auth required)           |
 | POST   | `/comments/:id/like`     | Like/unlike a comment (auth required)      |
-| GET    | `/comments/:id/like`     | Check if user liked a comment             |
 
 ---
 
@@ -106,7 +116,7 @@ A full-stack web application that lets users create **customizable, shareable pr
 ### 1️⃣ Clone the repo
 
 ```bash
-git clone https://github.com/TheHillofSunflowers/PersonaScape.git
+git clone https://github.com/yourusername/PersonaScape.git
 cd PersonaScape
 ```
 
@@ -148,7 +158,9 @@ npm run dev
 
 * Import repo in Vercel dashboard
 * Set root directory: `/frontend`
-* Configure environment variables for API URL
+* Configure environment variables:
+  * `NEXT_PUBLIC_API_URL`: Your backend URL
+  * `NEXT_PUBLIC_IMGBB_API_KEY`: For profile image uploads (optional)
 
 ### Backend (Render)
 
@@ -156,38 +168,35 @@ npm run dev
 * Set root directory: `/backend`
 * Build Command: `npm install`
 * Start Command: `node src/index.js`
-* Add environment variables via the Render UI
+* Add environment variables (see `.env` above)
+* Add a persistent disk for uploads
 
 ---
 
 ## 🔑 Auth Flow
 
 * JWT-based authentication system
-* Tokens stored in HTTP-only cookies
+* Tokens stored in HTTP-only cookies and localStorage (fallback)
 * Protected routes require valid authentication
 * User permissions based on profile ownership
 
 ---
 
-## ✅ TODO / Future Features
+## ✅ Future Features
 
-* Enhanced analytics (views, engagement metrics)
-* Profile templates/themes marketplace
+* Enhanced analytics (time-based engagement metrics)
 * User following/connections system
 * Activity feed of liked/commented profiles
-* Dark mode support
 * Social media authentication (OAuth)
 * Email verification
 * Password reset functionality
 * Admin dashboard
-* Profile content moderation
-* Notifications system
-* Search and filtering features
+* Dark/light mode toggle
 * Comprehensive test coverage
 
 ---
 
-# 👨‍�� License
+## �� License
 
 MIT
 
