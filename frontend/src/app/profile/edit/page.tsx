@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/api';
+import { getImageUrl, getBackgroundImageStyle } from '@/lib/imageUtils';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -211,11 +212,64 @@ export default function EditProfilePage() {
         }
       });
       
+      console.log('Background image upload response:', response.data);
+      
+      // Check for backgroundImage URL in the response
       if (response.data && response.data.backgroundImage) {
         return response.data.backgroundImage;
-      } else {
-        throw new Error('Failed to upload background image');
       }
+      
+      // Try to find any image URL in the response
+      if (response.data) {
+        // Check in nested 'profile' object
+        if (response.data.profile && response.data.profile.backgroundImage) {
+          return response.data.profile.backgroundImage;
+        }
+        
+        // Check for any property that looks like an image URL
+        for (const key in response.data) {
+          const value = response.data[key];
+          if (typeof value === 'string' && 
+              (value.includes('/uploads/') || 
+               value.includes('.png') || 
+               value.includes('.jpg') || 
+               value.includes('.jpeg'))) {
+            console.log(`Found image URL in response.${key}:`, value);
+            return value;
+          }
+        }
+        
+        // Recursively check nested objects
+        const findImageUrl = (obj: any): string | null => {
+          if (!obj || typeof obj !== 'object') return null;
+          
+          for (const key in obj) {
+            const value = obj[key];
+            
+            // Check if this property is an image URL
+            if (typeof value === 'string' && 
+                (value.includes('/uploads/') || 
+                 value.includes('.png') || 
+                 value.includes('.jpg') || 
+                 value.includes('.jpeg'))) {
+              return value;
+            }
+            
+            // Recursively check nested objects
+            if (value && typeof value === 'object') {
+              const nestedUrl = findImageUrl(value);
+              if (nestedUrl) return nestedUrl;
+            }
+          }
+          
+          return null;
+        };
+        
+        const foundUrl = findImageUrl(response.data);
+        if (foundUrl) return foundUrl;
+      }
+      
+      throw new Error('Failed to upload background image: Invalid response format');
     } catch (error) {
       console.error('Error uploading background image:', error);
       throw error;
@@ -446,13 +500,11 @@ export default function EditProfilePage() {
               <h2 className="text-xl font-semibold text-white">Background Image</h2>
               <div className="flex flex-col gap-6">
                 <div className="w-full">
-                  <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-700 border-2 border-gray-600">
+                  <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-gray-600 bg-gray-700">
                     {backgroundPreviewUrl ? (
-                      <Image 
-                        src={backgroundPreviewUrl} 
-                        alt="Background preview" 
-                        fill 
-                        style={{ objectFit: 'cover' }}
+                      <div 
+                        className="absolute inset-0 bg-center bg-cover"
+                        style={getBackgroundImageStyle(backgroundPreviewUrl)}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">

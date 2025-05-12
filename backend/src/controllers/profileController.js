@@ -279,10 +279,20 @@ const uploadBackgroundImage = async (req, res, next) => {
       select: { username: true }
     });
     
+    // Return a more detailed response for debugging
     res.json({
-      ...profile,
-      username: user.username,
-      backgroundImage: fileUrl
+      message: 'Background image uploaded successfully',
+      profile: {
+        ...profile,
+        username: user.username,
+      },
+      backgroundImage: fileUrl,
+      fileInfo: {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        path: req.file.path,
+        size: req.file.size
+      }
     });
   } catch (error) {
     console.error('Error in uploadBackgroundImage:', error);

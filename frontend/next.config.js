@@ -28,7 +28,7 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['i.ibb.co', 'image.ibb.co']
+    domains: ['i.ibb.co', 'image.ibb.co', 'personascape.onrender.com']
   }
 };
 

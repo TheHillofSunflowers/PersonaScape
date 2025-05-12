@@ -7,6 +7,7 @@ import LikeButton from "@/components/LikeButton";
 import ViewCount from "@/components/ViewCount";
 import CommentSection from "@/components/CommentSection";
 import { recordProfileView } from "@/lib/views-api";
+import { getImageUrl, getBackgroundImageStyle } from "@/lib/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -182,15 +183,11 @@ export default function ProfilePage() {
       {/* Background Image */}
       {profile.backgroundImage && (
         <div className="fixed inset-0 z-0">
-          <Image 
-            src={profile.backgroundImage}
-            alt={`${profile.username}'s background`}
-            fill
-            priority
-            style={{ objectFit: 'cover', opacity: 0.3 }}
-            className="backdrop-blur-sm"
+          <div 
+            className="absolute inset-0 bg-center bg-cover opacity-30"
+            style={getBackgroundImageStyle(profile.backgroundImage)}
           />
-          <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
       )}
       
