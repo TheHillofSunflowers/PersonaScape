@@ -207,7 +207,7 @@ app.get('/api/debug-image-access', (req, res) => {
       const relativePath = `/uploads/${file}`;
       return {
         filename: file,
-        url: `https://${req.get('host')}${relativePath}`,
+        url: `${req.protocol}://${req.get('host')}${relativePath}`,
         path: relativePath
       };
     });

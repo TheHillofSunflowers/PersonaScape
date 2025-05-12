@@ -8,17 +8,13 @@
 export function getImageUrl(url: string | null | undefined): string {
   if (!url) return '';
   
-  // Convert HTTP to HTTPS for our backend URLs, ensuring secure connections
-  if (url.startsWith('http://personascape.onrender.com')) {
-    return url.replace('http://', 'https://');
-  }
-  
-  // If the URL is already an absolute URL with https, return it as is
-  if (url.startsWith('https://')) {
+  // If the URL is already an absolute URL (http:// or https://), return it as is
+  // Don't convert HTTP to HTTPS as it can cause issues with local development or different environments
+  if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
   
-  // If it's a relative URL from backend (starts with /uploads), make it absolute with HTTPS
+  // If it's a relative URL from backend (starts with /uploads), make it absolute
   if (url.startsWith('/uploads')) {
     const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://personascape.onrender.com';
     return `${baseURL}${url}`;
