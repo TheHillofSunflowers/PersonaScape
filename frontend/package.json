@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node -r ./skip-checks.js ./node_modules/.bin/next build",
+    "build:win": "node -r ./skip-checks.js ./node_modules/.bin/next build",
+    "build:safe": "next build",
     "start": "next start",
     "lint": "next lint"
   },

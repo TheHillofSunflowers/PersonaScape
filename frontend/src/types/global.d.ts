@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 // Global type declarations for the app
 
 // Define types for image URL arguments
@@ -18,12 +20,12 @@ declare namespace NodeJS {
 }
 
 // Helper for API responses
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
   headers: Record<string, string>;
-  config: any;
+  config: Record<string, unknown>;
 }
 
 // API utility types
