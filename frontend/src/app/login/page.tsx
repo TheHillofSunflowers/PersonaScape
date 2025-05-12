@@ -5,6 +5,7 @@ import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -53,42 +54,70 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-xl shadow bg-white">
-      <h1 className="text-2xl font-bold mb-4">Log In</h1>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-      <form onSubmit={handleLogin} className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-        >
-          Log In
-        </button>
+    <div className="min-h-screen bg-[#16171d] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-[#23242b] rounded-xl p-8 border border-[#32333c] shadow-lg">
+        <div className="mb-8 text-center">
+          <Link
+            href="/"
+            className="text-2xl font-semibold text-blue-400 hover:text-blue-300 transition mb-4 inline-block"
+          >
+            PersonaScape
+          </Link>
+          <h1 className="text-2xl font-bold text-white">Log In</h1>
+        </div>
+        
+        {error && (
+          <div className="mb-4 p-3 rounded-md bg-red-900/20 border border-red-800 text-red-400">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition-colors font-medium"
+          >
+            Sign In
+          </button>
 
-        <p className="text-sm mt-4 text-center">
+          <p className="text-sm mt-6 text-center text-gray-400">
             Don&apos;t have an account?{" "}
-            <a href="/signup" className="text-blue-500 hover:underline">
-                Sign up
-            </a>
-        </p>
-
-
-      </form>
+            <Link href="/signup" className="text-blue-400 hover:text-blue-300 transition">
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

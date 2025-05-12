@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import Link from "next/link";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
@@ -71,52 +72,87 @@ export default function Signup() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border p-2 rounded"
-            required
-          />
+    <div className="min-h-screen bg-[#16171d] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full bg-[#23242b] rounded-xl p-8 border border-[#32333c] shadow-lg">
+        <div className="mb-8 text-center">
+          <Link
+            href="/"
+            className="text-2xl font-semibold text-blue-400 hover:text-blue-300 transition mb-4 inline-block"
+          >
+            PersonaScape
+          </Link>
+          <h1 className="text-2xl font-bold text-white">Create Account</h1>
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
+        {error && (
+          <div className="mb-4 p-3 rounded-md bg-red-900/20 border border-red-800 text-red-400">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 p-3 rounded-md bg-green-900/20 border border-green-800 text-green-400">
+            {success}
+          </div>
+        )}
 
-        <div>
-          <label className="block mb-1 font-medium">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
 
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
-        >
-          Sign Up
-        </button>
-      </form>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 px-4 rounded-md transition-colors font-medium"
+          >
+            Create Account
+          </button>
+          
+          <p className="text-sm mt-6 text-center text-gray-400">
+            Already have an account?{" "}
+            <Link href="/login" className="text-blue-400 hover:text-blue-300 transition">
+              Sign in
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
