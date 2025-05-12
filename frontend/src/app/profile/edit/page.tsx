@@ -36,7 +36,6 @@ export default function EditProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const [isNewProfile, setIsNewProfile] = useState(true);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -62,8 +61,6 @@ export default function EditProfilePage() {
           const response = await api.get(`/api/profile/${user.username}`);
           
           if (response.data) {
-            setIsNewProfile(false); // This is an existing profile
-            
             // Process hobbies from string to string
             let hobbiesStr = '';
             if (response.data.hobbies) {
@@ -108,7 +105,6 @@ export default function EditProfilePage() {
           }
         } catch {
           // If profile doesn't exist yet, we'll just use the default empty profile
-          setIsNewProfile(true); // This is a new profile
           console.log('Creating new profile as none exists yet');
           
           // Default profile is already set in the initial state, so we don't need to do anything
@@ -486,7 +482,7 @@ export default function EditProfilePage() {
                   placeholder="<div class='custom-section'>Your custom HTML here</div>"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Advanced: Add custom HTML to extend your profile's functionality.
+                  Advanced: Add custom HTML to extend your profile&apos;s functionality.
                 </p>
               </div>
             </div>
@@ -509,4 +505,4 @@ export default function EditProfilePage() {
       </div>
     </div>
   );
-} 
+}
