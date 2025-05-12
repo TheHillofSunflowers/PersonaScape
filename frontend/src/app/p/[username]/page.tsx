@@ -10,6 +10,7 @@ import { recordProfileView } from "@/lib/views-api";
 import { getBackgroundImageStyle } from "@/lib/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface SocialLink {
   platform: string;
@@ -272,7 +273,7 @@ export default function ProfilePage() {
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-4 text-white">About</h2>
                 <div className="p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]">
-                  <p className="text-gray-300 whitespace-pre-wrap">{profile.bio}</p>
+                  <MarkdownRenderer content={profile.bio} />
                 </div>
               </div>
             )}

@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { getBackgroundImageStyle } from '@/lib/imageUtils';
 import Image from 'next/image';
 import Link from 'next/link';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface ProfileData {
   id?: number;
@@ -550,16 +551,33 @@ export default function EditProfilePage() {
               <h2 className="text-xl font-semibold text-white">Bio</h2>
               <div>
                 <label htmlFor="bio" className="block text-gray-300 text-sm font-medium mb-2">
-                  Tell us about yourself
+                  Tell us about yourself (Markdown supported)
                 </label>
-                <textarea
-                  id="bio"
-                  value={profile.bio}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  rows={4}
-                  className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Write something about yourself..."
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <textarea
+                      id="bio"
+                      value={profile.bio}
+                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                      rows={8}
+                      className="w-full p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                      placeholder="Write something about yourself using Markdown..."
+                    />
+                    <p className="mt-1 text-xs text-gray-400">
+                      Supports Markdown: **bold**, *italic*, [links](url), # headers, etc.
+                    </p>
+                  </div>
+                  <div>
+                    <div className="p-3 bg-[#2a2b33] border border-[#32333c] rounded-md text-gray-300 min-h-[12rem] overflow-auto">
+                      <h3 className="text-sm font-medium mb-2 text-gray-400">Preview:</h3>
+                      {profile.bio ? (
+                        <MarkdownRenderer content={profile.bio} />
+                      ) : (
+                        <p className="text-gray-500 italic">Your formatted bio will appear here...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
