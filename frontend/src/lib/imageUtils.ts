@@ -4,7 +4,6 @@
 
 /**
  * Ensures an image URL is properly formatted for use in the frontend
- * Handles both Next.js Image component and CSS background-image
  */
 export function getImageUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -27,7 +26,7 @@ export function getImageUrl(url: string | null | undefined): string {
 /**
  * Creates a CSS background-image value from a URL
  */
-export function getBackgroundImageStyle(url: string | null | undefined): React.CSSProperties {
+export function getBackgroundImageStyle(url: string | null | undefined): { backgroundImage?: string } {
   const safeUrl = getImageUrl(url);
   return safeUrl ? { backgroundImage: `url('${safeUrl}')` } : {};
 } 

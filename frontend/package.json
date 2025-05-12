@@ -5,8 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:skip": "NEXT_SKIP_LINT=true NEXT_SKIP_TYPECHECK=true next build",
-    "build:win": "build.bat",
     "start": "next start",
     "lint": "next lint"
   },

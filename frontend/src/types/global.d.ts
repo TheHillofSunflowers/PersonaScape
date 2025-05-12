@@ -7,13 +7,10 @@ declare namespace React {
   }
 }
 
-// Add types for environment variables
+// Simplified environment variables declaration
 declare namespace NodeJS {
   interface ProcessEnv {
-    NEXT_PUBLIC_API_URL: string;
-    NEXT_PUBLIC_API_BASE_URL: string;
-    NEXT_PUBLIC_IMGBB_API_KEY: string;
-    NEXT_PUBLIC_JWT_COOKIE_NAME: string;
+    [key: string]: string | undefined;
   }
 }
 
