@@ -9,7 +9,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-accent-800 shadow-soft backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90 border-b border-accent-200 dark:border-accent-700">
+    <nav className="sticky top-0 z-50 bg-accent-200 dark:bg-accent-800 shadow-soft backdrop-blur-sm border-b border-accent-300 dark:border-accent-700">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo and brand */}
@@ -28,7 +28,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-1">
             <Link 
               href="/leaderboard" 
-              className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+              className="px-4 py-2 text-accent-800 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
             >
               Leaderboard
             </Link>
@@ -37,19 +37,19 @@ export default function Navbar() {
               <>
                 <Link 
                   href="/dashboard" 
-                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                  className="px-4 py-2 text-accent-800 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
                 >
                   Dashboard
                 </Link>
                 <Link 
                   href={`/p/${user.username}`}
-                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                  className="px-4 py-2 text-accent-800 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
                 >
                   My Profile
                 </Link>
                 <button
                   onClick={logout}
-                  className="ml-2 px-4 py-2 bg-accent-100 dark:bg-accent-700 text-accent-700 dark:text-accent-200 hover:bg-accent-200 dark:hover:bg-accent-600 rounded-md transition-colors"
+                  className="ml-2 px-4 py-2 bg-accent-300 dark:bg-accent-700 text-accent-800 dark:text-accent-200 hover:bg-accent-400 dark:hover:bg-accent-600 rounded-md transition-colors cursor-pointer"
                 >
                   Log Out
                 </button>
@@ -58,13 +58,13 @@ export default function Navbar() {
               <>
                 <Link 
                   href="/login" 
-                  className="px-4 py-2 text-accent-600 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
+                  className="px-4 py-2 text-accent-800 dark:text-accent-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors rounded-md"
                 >
                   Log In
                 </Link>
                 <Link 
                   href="/signup" 
-                  className="ml-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors shadow-button"
+                  className="ml-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md transition-colors shadow-button cursor-pointer"
                 >
                   Sign Up
                 </Link>
@@ -76,7 +76,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md text-accent-500 hover:text-accent-700 dark:text-accent-300 dark:hover:text-accent-100 focus:outline-none"
+              className="p-2 rounded-md text-accent-700 hover:text-accent-900 dark:text-accent-300 dark:hover:text-accent-100 focus:outline-none cursor-pointer"
             >
               <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
@@ -93,10 +93,10 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden animate-slide-up">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-accent-800 border-t border-accent-200 dark:border-accent-700">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-accent-200 dark:bg-accent-800 border-t border-accent-300 dark:border-accent-700">
             <Link 
               href="/leaderboard" 
-              className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+              className="block px-3 py-2 text-accent-800 dark:text-accent-300 hover:bg-accent-300 dark:hover:bg-accent-700 rounded-md"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Leaderboard
@@ -106,14 +106,14 @@ export default function Navbar() {
               <>
                 <Link 
                   href="/dashboard" 
-                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  className="block px-3 py-2 text-accent-800 dark:text-accent-300 hover:bg-accent-300 dark:hover:bg-accent-700 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   href={`/p/${user.username}`}
-                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  className="block px-3 py-2 text-accent-800 dark:text-accent-300 hover:bg-accent-300 dark:hover:bg-accent-700 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   My Profile
@@ -123,7 +123,7 @@ export default function Navbar() {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  className="block w-full text-left px-3 py-2 text-accent-800 dark:text-accent-300 hover:bg-accent-300 dark:hover:bg-accent-700 rounded-md cursor-pointer"
                 >
                   Log Out
                 </button>
@@ -132,14 +132,14 @@ export default function Navbar() {
               <>
                 <Link 
                   href="/login" 
-                  className="block px-3 py-2 text-accent-600 dark:text-accent-300 hover:bg-accent-100 dark:hover:bg-accent-700 rounded-md"
+                  className="block px-3 py-2 text-accent-800 dark:text-accent-300 hover:bg-accent-300 dark:hover:bg-accent-700 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Log In
                 </Link>
                 <Link 
                   href="/signup" 
-                  className="block px-3 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md"
+                  className="block px-3 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-md cursor-pointer"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Sign Up

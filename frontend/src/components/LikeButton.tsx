@@ -116,7 +116,7 @@ export default function LikeButton({
         <button
           onClick={handleLikeToggle}
           className={`flex items-center justify-center rounded-full ${sizeClasses[size]} 
-            text-accent-300 dark:text-accent-600 cursor-not-allowed`}
+            text-accent-400 dark:text-accent-500 cursor-default`}
           aria-label="Cannot like your own profile"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -125,7 +125,7 @@ export default function LikeButton({
         </button>
         
         {showCount && (
-          <span className="text-accent-500 dark:text-accent-400 font-medium">{likesCount}</span>
+          <span className="text-accent-700 dark:text-accent-300 font-medium">{likesCount}</span>
         )}
         
         {showTooltip && (
@@ -145,8 +145,8 @@ export default function LikeButton({
         disabled={isLoading || !isAuthenticated}
         className={`flex items-center justify-center rounded-full transition-all ${sizeClasses[size]} 
           ${liked 
-            ? 'text-secondary-600 dark:text-secondary-400 scale-110 hover:text-secondary-700 dark:hover:text-secondary-300' 
-            : 'text-accent-400 dark:text-accent-500 hover:text-secondary-500 dark:hover:text-secondary-400 hover:scale-110'
+            ? 'text-secondary-700 dark:text-secondary-400 scale-110 hover:text-secondary-800 dark:hover:text-secondary-300' 
+            : 'text-accent-600 dark:text-accent-400 hover:text-secondary-600 dark:hover:text-secondary-400 hover:scale-110'
           } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         aria-label={liked ? 'Unlike profile' : 'Like profile'}
       >
@@ -168,11 +168,11 @@ export default function LikeButton({
       </button>
       
       {showCount && (
-        <span className="text-accent-600 dark:text-accent-400 font-medium">{likesCount}</span>
+        <span className="text-accent-700 dark:text-accent-300 font-medium">{likesCount}</span>
       )}
       
       {error && (
-        <span className="text-red-500 text-xs ml-2">{error}</span>
+        <span className="text-red-600 text-xs ml-2">{error}</span>
       )}
     </div>
   );
