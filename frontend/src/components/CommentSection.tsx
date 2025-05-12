@@ -7,13 +7,15 @@ import {
   createComment, 
   updateComment as updateCommentApi 
 } from '../lib/api/comments';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
+import { getComponentBgClass } from '@/lib/themeUtils';
 
 interface CommentSectionProps {
   profileId: number;
+  theme?: string;
 }
 
-export default function CommentSection({ profileId }: CommentSectionProps) {
+export default function CommentSection({ profileId, theme = 'default' }: CommentSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -170,40 +172,39 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
   };
   
   return (
-    <div className="mt-12 space-y-6">
-      <h2 className="text-2xl font-heading font-bold mb-6 text-brand-900 dark:text-brand-50">Comments</h2>
-      
+    <div className="space-y-6">
       {user ? (
-        <div className="mb-8 card p-6">
+        <div className={`mb-8 p-6 ${getComponentBgClass(theme)}`}>
           <CommentForm 
             profileId={profileId} 
             onSubmit={handleCreateComment} 
+            theme={theme}
           />
         </div>
       ) : (
-        <div className="card p-6 mb-8 text-center">
-          <p className="text-brand-700 dark:text-brand-200">
-            Please <a href="/login" className="text-primary-700 dark:text-primary-300 hover:underline font-medium cursor-pointer">log in</a> to leave a comment.
+        <div className={`mb-8 p-6 ${getComponentBgClass(theme)} text-center`}>
+          <p>
+            Please <a href="/login" className="text-blue-400 hover:underline font-medium cursor-pointer">log in</a> to leave a comment.
           </p>
         </div>
       )}
       
       {error && (
-        <div className="p-5 bg-danger-100 dark:bg-danger-900/20 text-danger-700 dark:text-danger-300 rounded-xl shadow-soft">
+        <div className="p-5 bg-red-900/20 text-red-400 rounded-lg">
           {error}
         </div>
       )}
       
       {loading && page === 1 ? (
-        <div className="text-center p-8 card">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-primary-500 mx-auto"></div>
-          <p className="mt-4 text-brand-700 dark:text-brand-200">Loading comments...</p>
+        <div className={`text-center p-8 ${getComponentBgClass(theme)}`}>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4">Loading comments...</p>
         </div>
       ) : (
         <>
           {comments.length === 0 ? (
-            <div className="text-center p-8 card">
-              <p className="text-brand-700 dark:text-brand-200">No comments yet. Be the first to comment!</p>
+            <div className={`text-center p-8 ${getComponentBgClass(theme)}`}>
+              <p>No comments yet. Be the first to comment!</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -215,18 +216,20 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
                     onReply={handleReply}
                     onEdit={handleEdit}
                     onDelete={handleDeleteComment}
+                    theme={theme}
                   />
                   
                   {replyToId === comment.id && (
-                    <div className="ml-14 mt-3 card p-4">
-                      <p className="text-sm text-brand-700 dark:text-brand-200 mb-3">
-                        Replying to <span className="font-medium text-primary-700 dark:text-primary-300">{comment.user.username}</span>
+                    <div className={`ml-14 mt-3 p-4 ${getComponentBgClass(theme)}`}>
+                      <p className="text-sm mb-3">
+                        Replying to <span className="font-medium">{comment.user.username}</span>
                       </p>
                       <CommentForm
                         profileId={profileId}
                         parentId={comment.id}
                         onSubmit={handleCreateComment}
                         onCancel={handleCancelReply}
+                        theme={theme}
                       />
                     </div>
                   )}
@@ -235,7 +238,7 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
               
               {loading && page > 1 && (
                 <div className="text-center p-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-t-2 border-primary-500 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-t-2 border-blue-500 mx-auto"></div>
                 </div>
               )}
               
@@ -243,7 +246,7 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
                 <div className="text-center pt-4">
                   <button
                     onClick={handleLoadMore}
-                    className="px-5 py-2 text-sm font-medium text-primary-700 bg-brand-50 dark:bg-brand-800 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors shadow-button cursor-pointer"
+                    className="px-5 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors cursor-pointer"
                   >
                     Load More Comments
                   </button>
@@ -256,14 +259,15 @@ export default function CommentSection({ profileId }: CommentSectionProps) {
       
       {editComment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="card rounded-xl shadow-soft p-6 w-full max-w-lg animate-fade-in">
-            <h3 className="text-xl font-heading font-bold mb-4 text-brand-900 dark:text-brand-50">Edit Comment</h3>
+          <div className={`rounded-xl shadow-lg p-6 w-full max-w-lg ${getComponentBgClass(theme)}`}>
+            <h3 className="text-xl font-bold mb-4">Edit Comment</h3>
             <CommentForm
               profileId={profileId}
               initialValue={editComment.content}
               onSubmit={handleUpdateComment}
               onCancel={handleCancelEdit}
               isEdit={true}
+              theme={theme}
             />
           </div>
         </div>

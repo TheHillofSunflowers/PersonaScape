@@ -8,6 +8,14 @@ import { getBackgroundImageStyle } from '@/lib/imageUtils';
 import Image from 'next/image';
 import Link from 'next/link';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import {
+  getThemeConfig,
+  getProfileCardClass,
+  getHeadingClass,
+  getInterestBadgeClass,
+  getSocialLinkClass,
+  getComponentBgClass
+} from '@/lib/themeUtils';
 
 interface ProfileData {
   id?: number;
@@ -654,6 +662,40 @@ export default function EditProfilePage() {
                   <option value="minimal">Minimal</option>
                   <option value="colorful">Colorful</option>
                 </select>
+              </div>
+              
+              {/* Theme Preview */}
+              <div>
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-300 mb-2">Theme Preview</h3>
+                  <div className={`p-4 overflow-hidden rounded-lg ${getProfileCardClass(profile.theme, false)}`}>
+                    <div className="flex flex-col space-y-3">
+                      <h3 className={getHeadingClass(profile.theme)}>Preview of {profile.theme} Theme</h3>
+                      
+                      <div className={`p-3 ${getComponentBgClass(profile.theme)}`}>
+                        <p className="text-sm">This is how your content will appear</p>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className={getInterestBadgeClass(profile.theme)}>
+                          Interest Tag
+                        </span>
+                        <span className={getInterestBadgeClass(profile.theme)}>
+                          Hobby
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <a href="#" className={getSocialLinkClass(profile.theme)}>
+                          Social Link
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Choose a theme that best matches your personal style
+                  </p>
+                </div>
               </div>
             </div>
             

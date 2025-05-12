@@ -1,8 +1,12 @@
+/**
+ * Types for the comment system
+ */
+
 export interface User {
   id: number;
   username: string;
   profile?: {
-    profilePicture?: string;
+    profilePicture?: string | null;
   };
 }
 
@@ -16,19 +20,18 @@ export interface CommentLike {
 export interface Comment {
   id: number;
   content: string;
-  profileId: number;
   userId: number;
+  profileId: number;
   parentId: number | null;
   createdAt: string;
   updatedAt: string;
   user: User;
   replies?: Comment[];
-  likes?: CommentLike[];
-  likesCount: number;
   _count?: {
     likes: number;
     replies: number;
   };
+  likesCount?: number;
 }
 
 export interface CommentPagination {
@@ -38,7 +41,7 @@ export interface CommentPagination {
   hasMore: boolean;
 }
 
-export interface CommentsResponse {
+export interface CommentResponse {
   comments: Comment[];
   pagination: CommentPagination;
 }

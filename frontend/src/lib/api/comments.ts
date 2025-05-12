@@ -1,53 +1,84 @@
 import api from '../api';
-import { Comment, CommentsResponse, CommentLikeResponse } from '../../types/comments';
+import { Comment, CommentResponse, CommentLikeResponse } from '../../types/comments';
 
-// Get comments for a profile with pagination
-export async function getProfileComments(profileId: number, page = 1, limit = 10): Promise<CommentsResponse> {
-  const response = await api.get(`/comments/profile/${profileId}?page=${page}&limit=${limit}`);
+/**
+ * Get comments for a profile
+ * @param profileId Profile ID
+ * @param page Page number (defaults to 1)
+ * @param limit Number of comments per page (defaults to 10)
+ * @returns Comments and pagination data
+ */
+export async function getProfileComments(
+  profileId: number, 
+  page: number = 1, 
+  limit: number = 10
+): Promise<CommentResponse> {
+  const response = await api.get(`/api/comments/profile/${profileId}?page=${page}&limit=${limit}`);
   return response.data;
 }
 
-// Get a specific comment with its replies
-export async function getComment(commentId: number): Promise<Comment> {
-  const response = await api.get(`/comments/${commentId}`);
+/**
+ * Create a new comment
+ * @param profileId Profile ID
+ * @param content Comment content
+ * @param parentId Optional parent comment ID for replies
+ * @returns The created comment
+ */
+export async function createComment(
+  profileId: number, 
+  content: string, 
+  parentId?: number
+): Promise<Comment> {
+  const response = await api.post('/api/comments', {
+    profileId,
+    content,
+    parentId
+  });
   return response.data;
 }
 
-// Create a new comment or reply
-export async function createComment(profileId: number, content: string, parentId?: number): Promise<Comment> {
-  const response = await api.post(
-    `/comments`,
-    { profileId, content, parentId }
-  );
+/**
+ * Update an existing comment
+ * @param commentId Comment ID
+ * @param content New comment content
+ * @returns The updated comment
+ */
+export async function updateComment(
+  commentId: number, 
+  content: string
+): Promise<Comment> {
+  const response = await api.put(`/api/comments/${commentId}`, {
+    content
+  });
   return response.data;
 }
 
-// Update a comment
-export async function updateComment(commentId: number, content: string): Promise<Comment> {
-  const response = await api.put(
-    `/comments/${commentId}`,
-    { content }
-  );
+/**
+ * Delete a comment
+ * @param commentId Comment ID
+ * @returns Success response
+ */
+export async function deleteComment(commentId: number): Promise<{ success: boolean }> {
+  const response = await api.delete(`/api/comments/${commentId}`);
   return response.data;
 }
 
-// Delete a comment
-export async function deleteComment(commentId: number): Promise<{ message: string }> {
-  const response = await api.delete(`/comments/${commentId}`);
-  return response.data;
-}
-
-// Like/unlike a comment
+/**
+ * Toggle like status for a comment
+ * @param commentId Comment ID
+ * @returns New like status
+ */
 export async function toggleCommentLike(commentId: number): Promise<CommentLikeResponse> {
-  const response = await api.post(
-    `/comments/${commentId}/like`,
-    {}
-  );
+  const response = await api.post(`/api/comments/${commentId}/like`);
   return response.data;
 }
 
-// Check if the current user has liked a comment
-export async function checkCommentLike(commentId: number): Promise<{ liked: boolean }> {
-  const response = await api.get(`/comments/${commentId}/like`);
+/**
+ * Get replies for a comment
+ * @param commentId Comment ID
+ * @returns Reply comments
+ */
+export async function getCommentReplies(commentId: number): Promise<Comment[]> {
+  const response = await api.get(`/api/comments/${commentId}/replies`);
   return response.data;
 } 

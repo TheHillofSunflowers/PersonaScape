@@ -11,6 +11,14 @@ import { getBackgroundImageStyle } from "@/lib/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import {
+  getProfileContainerClass,
+  getProfileCardClass,
+  getHeadingClass,
+  getInterestBadgeClass,
+  getSocialLinkClass,
+  getComponentBgClass
+} from "@/lib/themeUtils";
 
 interface SocialLink {
   platform: string;
@@ -180,7 +188,7 @@ export default function ProfilePage() {
   const hasSocialLinks = profile.socialLinks && profile.socialLinks.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#16171d] text-white">
+    <div className={getProfileContainerClass(profile.theme, !!profile.backgroundImage)}>
       {/* Background Image */}
       {profile.backgroundImage && (
         <div className="fixed inset-0 z-0">
@@ -230,7 +238,7 @@ export default function ProfilePage() {
             </nav>
           </header>
 
-          <div className={`rounded-xl p-8 shadow-lg backdrop-blur-sm ${profile.backgroundImage ? 'bg-[#23242b]/80 border border-[#32333c]/70' : 'bg-[#23242b] border border-[#32333c]'}`}>
+          <div className={getProfileCardClass(profile.theme, !!profile.backgroundImage)}>
             <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-6">
               <div className="flex items-center">
                 <div className="w-24 h-24 rounded-lg overflow-hidden bg-[#2a2b33] mr-6 flex-shrink-0 border border-[#32333c]">
@@ -271,8 +279,8 @@ export default function ProfilePage() {
             {/* Bio */}
             {profile.bio && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-white">About</h2>
-                <div className="p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]">
+                <h2 className={getHeadingClass(profile.theme)}>About</h2>
+                <div className={`p-4 ${getComponentBgClass(profile.theme)}`}>
                   <MarkdownRenderer content={profile.bio} />
                 </div>
               </div>
@@ -281,12 +289,12 @@ export default function ProfilePage() {
             {/* Hobbies */}
             {hobbiesArray.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-white">Interests</h2>
+                <h2 className={getHeadingClass(profile.theme)}>Interests</h2>
                 <div className="flex flex-wrap gap-2">
                   {hobbiesArray.map((hobby, index) => (
                     <span 
                       key={index}
-                      className="px-3 py-1 bg-[#2a2b33] rounded-full text-sm text-blue-300 border border-blue-800/30"
+                      className={getInterestBadgeClass(profile.theme)}
                     >
                       {hobby}
                     </span>
@@ -298,7 +306,7 @@ export default function ProfilePage() {
             {/* Social Links */}
             {hasSocialLinks && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-white">Connect</h2>
+                <h2 className={getHeadingClass(profile.theme)}>Connect</h2>
                 <div className="flex flex-wrap gap-3">
                   {profile.socialLinks?.map((link, index) => (
                     <a
@@ -306,7 +314,7 @@ export default function ProfilePage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 bg-[#2a2b33] rounded-lg text-sm text-blue-300 border border-[#32333c] hover:bg-[#32333d] transition-colors"
+                      className={getSocialLinkClass(profile.theme)}
                     >
                       {link.platform}
                     </a>
@@ -318,8 +326,8 @@ export default function ProfilePage() {
             {/* Custom HTML */}
             {profile.customHtml && (
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-white">Custom Content</h2>
-                <div className="p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]">
+                <h2 className={getHeadingClass(profile.theme)}>Custom Content</h2>
+                <div className={`p-4 ${getComponentBgClass(profile.theme)}`}>
                   <div dangerouslySetInnerHTML={{ __html: profile.customHtml }} />
                 </div>
               </div>
@@ -327,8 +335,8 @@ export default function ProfilePage() {
             
             {/* Comments */}
             <div className="mt-12">
-              <h2 className="text-xl font-semibold mb-6 text-white">Comments</h2>
-              <CommentSection profileId={profile.id} />
+                <h2 className={getHeadingClass(profile.theme)}>Comments</h2>
+                <CommentSection profileId={profile.id} theme={profile.theme} />
             </div>
           </div>
         </div>

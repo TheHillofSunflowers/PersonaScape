@@ -1,50 +1,18 @@
 import React, { useState } from 'react';
-// Remove the date-fns import
-import { Comment as CommentType } from '../types/comments';
+import { formatRelativeTime } from '../lib/dateUtils';
 import { toggleCommentLike, deleteComment } from '../lib/api/comments';
+import { Comment as CommentType } from '../types/comments';
+import { getComponentBgClass, getHighlightColorClass } from '../lib/themeUtils';
 import Image from 'next/image';
-
-// Simple date formatter function
-const formatRelativeTime = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
-  }
-  
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
-  }
-  
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
-  }
-  
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 30) {
-    return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
-  }
-  
-  const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12) {
-    return `${diffInMonths} month${diffInMonths !== 1 ? 's' : ''} ago`;
-  }
-  
-  const diffInYears = Math.floor(diffInMonths / 12);
-  return `${diffInYears} year${diffInYears !== 1 ? 's' : ''} ago`;
-};
 
 interface CommentProps {
   comment: CommentType;
-  currentUserId?: number | null;
+  currentUserId: number | null;
   onReply: (commentId: number) => void;
   onEdit: (comment: CommentType) => void;
   onDelete: (commentId: number) => void;
   isReply?: boolean;
+  theme?: string;
 }
 
 export default function Comment({ 
@@ -53,10 +21,11 @@ export default function Comment({
   onReply, 
   onEdit, 
   onDelete,
-  isReply = false 
+  isReply = false,
+  theme = 'default'
 }: CommentProps) {
   const [liked, setLiked] = useState<boolean>(false);
-  const [likesCount, setLikesCount] = useState<number>(comment.likesCount);
+  const [likesCount, setLikesCount] = useState<number>(comment._count?.likes || 0);
   const [showReplies, setShowReplies] = useState<boolean>(false);
   
   const isAuthor = currentUserId === comment.userId;
@@ -89,8 +58,8 @@ export default function Comment({
   };
   
   return (
-    <div className={`relative p-5 ${isReply ? 'ml-10 mt-3' : 'mb-2'} card transition-all ${!isReply && 'shadow-card'} hover:shadow-lg`}>
-      <div className="flex items-start space-x-4">
+    <div className={`p-4 ${getComponentBgClass(theme)} ${isReply ? 'ml-12' : ''}`}>
+      <div className="flex gap-3">
         <div className="flex-shrink-0">
           {comment.user.profile?.profilePicture ? (
             <Image 
@@ -106,6 +75,7 @@ export default function Comment({
             </div>
           )}
         </div>
+        
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-center mb-2">
             <p className="text-sm font-semibold text-brand-900 dark:text-brand-50">
@@ -135,8 +105,9 @@ export default function Comment({
               </svg>
               {likesCount > 0 && <span className="font-medium">{likesCount}</span>}
             </button>
+            
             {!isReply && (
-              <button 
+              <button
                 onClick={() => onReply(comment.id)}
                 className="text-xs text-brand-700 dark:text-brand-200 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
               >
@@ -146,9 +117,10 @@ export default function Comment({
                 Reply
               </button>
             )}
+            
             {isAuthor && (
               <>
-                <button 
+                <button
                   onClick={() => onEdit(comment)}
                   className="text-xs text-brand-700 dark:text-brand-200 hover:text-primary-700 dark:hover:text-primary-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
                 >
@@ -157,7 +129,8 @@ export default function Comment({
                   </svg>
                   Edit
                 </button>
-                <button 
+                
+                <button
                   onClick={handleDelete}
                   className="text-xs text-danger-600 dark:text-danger-400 hover:text-danger-700 dark:hover:text-danger-300 flex items-center transition-colors font-medium rounded-lg px-2 py-1 hover:bg-danger-100 dark:hover:bg-danger-900 cursor-pointer"
                 >
@@ -169,26 +142,28 @@ export default function Comment({
               </>
             )}
           </div>
+          
           {!isReply && hasReplies && (
-            <div className="mt-4 pt-2 border-t border-brand-100 dark:border-brand-700">
-              <button 
+            <div className="mt-4">
+              <button
                 onClick={toggleReplies}
-                className="text-xs text-primary-700 dark:text-primary-300 hover:text-primary-800 dark:hover:text-primary-200 font-medium flex items-center transition-colors rounded-lg px-2 py-1 hover:bg-brand-100 dark:hover:bg-brand-800 cursor-pointer"
+                className={`text-sm flex items-center ${getHighlightColorClass(theme)} hover:underline font-medium cursor-pointer`}
               >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className={`h-4 w-4 mr-1 transition-transform ${showReplies ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 mr-1 transition-transform ${showReplies ? 'rotate-90' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
                 {showReplies ? 'Hide' : 'Show'} {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
               </button>
+              
               {showReplies && comment.replies && (
-                <div className="mt-3 space-y-3 animate-fade-in">
-                  {comment.replies.map((reply) => (
+                <div className="mt-4 space-y-4">
+                  {comment.replies.map(reply => (
                     <Comment
                       key={reply.id}
                       comment={reply}
@@ -197,6 +172,7 @@ export default function Comment({
                       onEdit={onEdit}
                       onDelete={onDelete}
                       isReply={true}
+                      theme={theme}
                     />
                   ))}
                 </div>
