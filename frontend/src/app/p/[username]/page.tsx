@@ -192,12 +192,13 @@ export default function ProfilePage() {
       {/* Background Image */}
       {profile.backgroundImage && (
         <div className="fixed inset-0 z-0">
-          <div 
-            className="absolute inset-0 bg-center bg-cover opacity-30"
-            style={getBackgroundImageStyle(profile.backgroundImage)}
-            data-crossorigin="anonymous"
+          <img 
+            src={profile.backgroundImage}
+            alt="Background"
+            className="absolute inset-0 w-full h-full object-cover opacity-75"
+            crossOrigin="anonymous"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
         </div>
       )}
       

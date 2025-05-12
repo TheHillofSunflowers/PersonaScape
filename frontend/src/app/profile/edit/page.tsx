@@ -512,10 +512,11 @@ export default function EditProfilePage() {
                 <div className="w-full">
                   <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-gray-600 bg-gray-700">
                     {backgroundPreviewUrl ? (
-                      <div 
-                        className="absolute inset-0 bg-center bg-cover"
-                        style={getBackgroundImageStyle(backgroundPreviewUrl)}
-                        data-crossorigin="anonymous"
+                      <img 
+                        src={backgroundPreviewUrl}
+                        alt="Background Preview"
+                        className="absolute inset-0 w-full h-full object-cover"
+                        crossOrigin="anonymous"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">

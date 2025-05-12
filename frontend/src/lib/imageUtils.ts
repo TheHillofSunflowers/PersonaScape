@@ -29,16 +29,23 @@ export function getImageUrl(url: string | null | undefined): string {
 }
 
 /**
- * Creates a CSS background-image value from a URL
+ * Get a style object for a background image with fallback and proper URL handling
  */
-export function getBackgroundImageStyle(url: string | null | undefined): { backgroundImage?: string, crossOrigin?: string } {
-  const safeUrl = getImageUrl(url);
-  return safeUrl 
-    ? { 
-        backgroundImage: `url('${safeUrl}')`,
-        crossOrigin: 'anonymous' 
-      } 
-    : {};
+export function getBackgroundImageStyle(url: string | null | undefined): React.CSSProperties {
+  const imageUrl = getImageUrl(url);
+  
+  if (!imageUrl) {
+    return {};
+  }
+  
+  return {
+    backgroundImage: `url(${imageUrl})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    height: '100%',
+    width: '100%',
+  };
 }
 
 /**

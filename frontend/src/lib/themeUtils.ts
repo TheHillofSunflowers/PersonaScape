@@ -118,7 +118,15 @@ export function getProfileContainerClass(theme: string = 'default', hasBackgroun
   const themeConfig = getThemeConfig(theme);
   
   // Base container class
-  let containerClass = `min-h-screen ${themeConfig.colors.bgPrimary} ${themeConfig.colors.textPrimary} ${themeConfig.containerStyle}`;
+  let containerClass = `min-h-screen ${themeConfig.colors.textPrimary} ${themeConfig.containerStyle}`;
+  
+  // Apply background color only if there's no background image
+  if (!hasBackgroundImage) {
+    containerClass += ` ${themeConfig.colors.bgPrimary}`;
+  } else {
+    // For background images, we want to ensure good text contrast
+    containerClass += ' bg-gradient-to-b from-transparent to-black/20';
+  }
   
   // Add backdrop blur only if there's a background image
   if (hasBackgroundImage && theme !== 'minimal') {
