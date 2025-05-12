@@ -57,7 +57,7 @@ export default function Dashboard() {
               Dashboard
             </Link>
             <Link 
-              href="/profile"
+              href={`/p/${user?.username}`}
               className="text-gray-400 hover:text-white transition"
             >
               My Profile

@@ -37,7 +37,7 @@ export default function Home() {
       <section className="rounded-3xl card shadow-card p-10 md:p-16 text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none select-none opacity-30 bg-gradient-to-br from-primary-100 via-primary-200 to-accent-100 dark:from-brand-800 dark:via-primary-900 dark:to-accent-900" />
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 bg-gradient-to-r from-primary-600 via-accent-500 to-primary-400 text-transparent bg-clip-text drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 text-white drop-shadow-lg">
             Express Your Digital Identity
           </h1>
           <p className="text-lg md:text-xl text-brand-600 dark:text-brand-200 mb-10 max-w-2xl mx-auto">
