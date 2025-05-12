@@ -27,15 +27,18 @@ export default function ViewCount({
 
   // Size classes for the component
   const sizeClasses = {
-    sm: 'text-xs gap-0.5',
-    md: 'text-sm gap-1',
-    lg: 'text-base gap-1.5'
+    sm: 'text-xs gap-1',
+    md: 'text-sm gap-1.5',
+    lg: 'text-base gap-2'
   };
 
   return (
     <div className={`flex items-center ${sizeClasses[size]} ${className}`}>
-      <span className="text-gray-400 mr-1">👁️</span>
-      <span className="text-gray-500">{formattedCount}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span className="font-medium">{formattedCount}</span>
     </div>
   );
 } 

@@ -12,48 +12,76 @@ export default function LeaderboardPage() {
   const [activeTab, setActiveTab] = useState<'likes' | 'views'>('likes');
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#16171d] text-white py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Profile Leaderboard</h1>
+        <header className="flex justify-between items-center mb-10">
           <Link 
             href="/"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            className="text-2xl font-semibold text-blue-400 hover:text-blue-300 transition"
           >
-            Home
+            PersonaScape
           </Link>
+          <nav className="flex space-x-6 text-sm">
+            <Link 
+              href="/leaderboard"
+              className="text-blue-400 font-medium border-b-2 border-blue-400 pb-1"
+            >
+              Leaderboard
+            </Link>
+            <Link 
+              href="/dashboard"
+              className="text-gray-400 hover:text-white transition"
+            >
+              Dashboard
+            </Link>
+            <Link 
+              href="/profile"
+              className="text-gray-400 hover:text-white transition"
+            >
+              My Profile
+            </Link>
+            <Link 
+              href="/logout"
+              className="text-gray-400 hover:text-white transition"
+            >
+              Log Out
+            </Link>
+          </nav>
+        </header>
+        
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold mb-2">Profile Leaderboard</h1>
+          <p className="text-gray-400">
+            Discover the most popular profiles on PersonaScape.
+          </p>
         </div>
         
-        <p className="text-gray-600 mb-6">
-          Discover the most popular profiles on PersonaScape.
-        </p>
-        
         {/* Tabs for switching between likes and views */}
-        <div className="flex border-b border-gray-200 mb-6">
+        <div className="flex mb-8">
           <button
             onClick={() => setActiveTab('likes')}
-            className={`py-3 px-6 font-medium ${
+            className={`py-2 px-6 font-medium rounded-tl-md rounded-bl-md ${
               activeTab === 'likes' 
-                ? 'border-b-2 border-blue-500 text-blue-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-blue-500 text-white'
+                : 'bg-[#23242b] text-gray-300 hover:bg-[#2a2b33] hover:text-white'
             }`}
           >
             Most Liked
           </button>
           <button
             onClick={() => setActiveTab('views')}
-            className={`py-3 px-6 font-medium ${
+            className={`py-2 px-6 font-medium rounded-tr-md rounded-br-md ${
               activeTab === 'views' 
-                ? 'border-b-2 border-blue-500 text-blue-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-blue-500 text-white'
+                : 'bg-[#23242b] text-gray-300 hover:bg-[#2a2b33] hover:text-white'
             }`}
           >
             Most Viewed
           </button>
         </div>
         
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Number of profiles to show:
           </label>
           <div className="flex space-x-2">
@@ -61,10 +89,10 @@ export default function LeaderboardPage() {
               <button
                 key={value}
                 onClick={() => setLimit(value)}
-                className={`py-2 px-4 rounded ${
+                className={`py-2 px-4 text-sm font-medium rounded-md transition-colors ${
                   limit === value
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    : 'bg-[#23242b] text-gray-300 hover:bg-[#2a2b33] hover:text-white'
                 }`}
               >
                 {value}
@@ -87,22 +115,28 @@ export default function LeaderboardPage() {
           />
         )}
         
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold mb-4">About PersonaScape Metrics</h2>
-          <div className="space-y-4 text-gray-600">
-            <p>
-              <strong>Likes</strong> - Users can like profiles they enjoy. You need to be logged in to like a profile, and you cannot like your own profile.
-            </p>
-            <p>
-              <strong>Views</strong> - Profile views are counted uniquely - multiple views from the same visitor on the same day only count once.
-            </p>
-            <p>
+        <div className="bg-[#23242b] rounded-xl p-6 border border-[#32333c]">
+          <h2 className="text-xl font-bold mb-4 text-white">About PersonaScape Metrics</h2>
+          <div className="space-y-4 text-gray-300">
+            <div className="flex items-start space-x-3">
+              <span className="text-pink-400 text-lg">❤</span>
+              <p>
+                <strong className="text-white">Likes</strong> - Users can like profiles they enjoy. You need to be logged in to like a profile, and you cannot like your own profile.
+              </p>
+            </div>
+            <div className="flex items-start space-x-3">
+              <span className="text-blue-400 text-lg">👁️</span>
+              <p>
+                <strong className="text-white">Views</strong> - Profile views are counted uniquely - multiple views from the same visitor on the same day only count once.
+              </p>
+            </div>
+            <p className="pt-2">
               Create your own profile today and start building your web presence!
             </p>
             <div className="pt-4">
               <Link 
                 href="/signup"
-                className="inline-block bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded"
+                className="inline-block bg-pink-500 hover:bg-pink-600 text-white py-2 px-6 rounded-md transition-colors"
               >
                 Create Your Profile
               </Link>

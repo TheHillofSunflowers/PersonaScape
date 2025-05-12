@@ -51,10 +51,10 @@ export default function Leaderboard({
 
   if (loading) {
     return (
-      <div className={`card p-8 rounded-2xl shadow-card ${className}`}>
-        <h2 className="text-2xl font-heading font-bold mb-6 text-brand-900 dark:text-brand-50">{title}</h2>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
         <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-primary-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-blue-500"></div>
         </div>
       </div>
     );
@@ -62,13 +62,13 @@ export default function Leaderboard({
 
   if (error) {
     return (
-      <div className={`card p-8 rounded-2xl shadow-card ${className}`}>
-        <h2 className="text-2xl font-heading font-bold mb-6 text-brand-900 dark:text-brand-50">{title}</h2>
-        <div className="p-6 text-center rounded-xl bg-danger-100 dark:bg-danger-900/20">
-          <p className="text-danger-700 dark:text-danger-300">{error}</p>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
+        <div className="p-6 text-center rounded-xl bg-red-900/20 border border-red-800">
+          <p className="text-red-400">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-button font-medium"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
           >
             Retry
           </button>
@@ -79,35 +79,35 @@ export default function Leaderboard({
 
   if (profiles.length === 0) {
     return (
-      <div className={`card p-8 rounded-2xl shadow-card ${className}`}>
-        <h2 className="text-2xl font-heading font-bold mb-6 text-brand-900 dark:text-brand-50">{title}</h2>
-        <p className="text-brand-700 dark:text-brand-200 text-center py-8">No profiles found yet</p>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
+        <p className="text-gray-400 text-center py-8">No profiles found yet</p>
       </div>
     );
   }
 
   return (
-    <div className={`card p-8 rounded-2xl shadow-card ${className} animate-fade-in`}>
-      <h2 className="text-2xl font-heading font-bold mb-6 text-brand-900 dark:text-brand-50">{title}</h2>
+    <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+      <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
       <ul className="space-y-3">
         {profiles.map((profile, index) => (
           <li 
             key={profile.id}
-            className={`flex items-center p-4 rounded-xl transition-all group hover:shadow-lg hover:-translate-y-1 duration-150 bg-brand-50 dark:bg-brand-800/60 border border-brand-100 dark:border-brand-800 ${
-              index === 0 ? 'bg-gradient-to-r from-primary-100 to-accent-50 dark:from-primary-900/30 dark:to-accent-900/30 border-2 border-primary-300 dark:border-primary-700' :
-              index === 1 ? 'bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/10 dark:to-accent-900/10 border border-primary-200 dark:border-primary-700' :
-              'bg-brand-50 dark:bg-brand-800/60 border border-brand-100 dark:border-brand-800'}
-            `}
+            className={`flex items-center p-4 rounded-lg transition-all hover:bg-[#2a2b33] border border-[#32333c] ${
+              index === 0 ? 'bg-blue-900/20 border-blue-800' : 
+              index === 1 ? 'bg-blue-900/10 border-blue-800/70' : 
+              'bg-[#23242b]'
+            }`}
           >
-            <div className={`mr-4 font-bold text-lg w-8 text-center rounded-full h-8 flex items-center justify-center
-              ${index === 0 ? 'bg-primary-600 text-white shadow-card' :
-                index === 1 ? 'bg-primary-500 text-white' :
-                index === 2 ? 'bg-primary-400 text-white' :
-                'text-brand-700 dark:text-brand-200 bg-brand-200 dark:bg-brand-700'}
+            <div className={`mr-4 font-bold text-lg w-8 h-8 text-center rounded-md flex items-center justify-center
+              ${index === 0 ? 'bg-blue-500 text-white' : 
+                index === 1 ? 'bg-blue-600/80 text-white' : 
+                index === 2 ? 'bg-blue-700/80 text-white' : 
+                'text-gray-400 bg-[#2a2b33]'}
             `}>
               {index + 1}
             </div>
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-brand-200 dark:bg-brand-700 mr-4 flex-shrink-0 shadow-soft">
+            <div className="w-12 h-12 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-[#32333c]">
               {profile.profilePicture ? (
                 <Image 
                   src={profile.profilePicture} 
@@ -117,7 +117,7 @@ export default function Leaderboard({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary-100 dark:bg-primary-800 text-primary-700 dark:text-primary-300 font-bold text-lg">
+                <div className="w-full h-full flex items-center justify-center bg-[#3a3b44] text-blue-300 font-bold text-lg">
                   {profile.username.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -125,12 +125,12 @@ export default function Leaderboard({
             <div className="flex-1 min-w-0">
               <Link 
                 href={`/p/${profile.username}`}
-                className="font-semibold text-primary-700 dark:text-primary-200 hover:text-primary-800 dark:hover:text-primary-100 transition-colors text-lg cursor-pointer truncate"
+                className="font-semibold text-blue-400 hover:text-blue-300 transition-colors text-lg cursor-pointer truncate"
               >
                 {profile.username}
               </Link>
               {profile.bio && (
-                <p className="text-brand-700 dark:text-brand-200 text-sm mt-1 truncate">
+                <p className="text-gray-400 text-sm mt-1 truncate">
                   {profile.bio}
                 </p>
               )}
@@ -141,6 +141,7 @@ export default function Leaderboard({
                 initialLikesCount={profile.likesCount} 
                 size="sm"
                 username={profile.username}
+                className="text-pink-400"
               />
             </div>
           </li>

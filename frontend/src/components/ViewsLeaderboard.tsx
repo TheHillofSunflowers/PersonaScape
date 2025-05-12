@@ -39,10 +39,10 @@ export default function ViewsLeaderboard({
 
   if (loading) {
     return (
-      <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
         <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-blue-500"></div>
         </div>
       </div>
     );
@@ -50,13 +50,13 @@ export default function ViewsLeaderboard({
 
   if (error) {
     return (
-      <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
-        <div className="p-4 text-center text-red-500">
-          <p>{error}</p>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
+        <div className="p-6 text-center rounded-xl bg-red-900/20 border border-red-800">
+          <p className="text-red-400">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
           >
             Retry
           </button>
@@ -67,36 +67,45 @@ export default function ViewsLeaderboard({
 
   if (profiles.length === 0) {
     return (
-      <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
-        <p className="text-gray-500 text-center py-4">No profiles found</p>
+      <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+        <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
+        <p className="text-gray-400 text-center py-8">No profiles found</p>
       </div>
     );
   }
 
   return (
-    <div className={`p-4 rounded-lg shadow-md bg-white ${className}`}>
-      <h2 className="text-xl font-bold mb-4">{title}</h2>
+    <div className={`bg-[#23242b] p-6 rounded-xl border border-[#32333c] shadow-lg ${className}`}>
+      <h2 className="text-xl font-bold mb-6 text-white">{title}</h2>
       <ul className="space-y-3">
         {profiles.map((profile, index) => (
           <li 
             key={profile.profileId}
-            className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors"
+            className={`flex items-center p-4 rounded-lg transition-all hover:bg-[#2a2b33] border border-[#32333c] ${
+              index === 0 ? 'bg-blue-900/20 border-blue-800' : 
+              index === 1 ? 'bg-blue-900/10 border-blue-800/70' : 
+              'bg-[#23242b]'
+            }`}
           >
-            <div className="mr-3 font-bold text-lg text-gray-500 w-8 text-center">
+            <div className={`mr-4 font-bold text-lg w-8 h-8 text-center rounded-md flex items-center justify-center
+              ${index === 0 ? 'bg-blue-500 text-white' : 
+                index === 1 ? 'bg-blue-600/80 text-white' : 
+                index === 2 ? 'bg-blue-700/80 text-white' : 
+                'text-gray-400 bg-[#2a2b33]'}
+            `}>
               {index + 1}
             </div>
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0">
+            <div className="w-12 h-12 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-[#32333c]">
               {profile.profilePicture ? (
                 <Image 
                   src={profile.profilePicture} 
                   alt={`${profile.username}'s profile picture`}
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500 font-bold">
+                <div className="w-full h-full flex items-center justify-center bg-[#3a3b44] text-blue-300 font-bold text-lg">
                   {profile.username.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -104,7 +113,7 @@ export default function ViewsLeaderboard({
             <div className="flex-1">
               <Link 
                 href={`/p/${profile.username}`}
-                className="font-medium text-blue-600 hover:underline"
+                className="font-semibold text-blue-400 hover:text-blue-300 transition-colors text-lg cursor-pointer"
               >
                 {profile.username}
               </Link>
@@ -113,6 +122,7 @@ export default function ViewsLeaderboard({
               <ViewCount 
                 count={profile.viewsCount} 
                 size="sm"
+                className="text-blue-400"
               />
             </div>
           </li>

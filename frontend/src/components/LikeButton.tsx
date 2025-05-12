@@ -31,9 +31,15 @@ export default function LikeButton({
 
   // Size classes for the button
   const sizeClasses = {
-    sm: 'text-sm p-1',
-    md: 'text-base p-2',
-    lg: 'text-lg p-3'
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg'
+  };
+  
+  const iconSizes = {
+    sm: 'w-5 h-5',
+    md: 'w-6 h-6',
+    lg: 'w-7 h-7'
   };
 
   // Check if this is the user's own profile
@@ -115,23 +121,23 @@ export default function LikeButton({
       <div className={`flex items-center gap-2 ${className} relative`}>
         <button
           onClick={handleLikeToggle}
-          className={`flex items-center justify-center rounded-full ${sizeClasses[size]} text-brand-300 dark:text-brand-500 cursor-default bg-brand-100 dark:bg-brand-800`}
+          className={`flex items-center justify-center rounded-md p-1.5 bg-[#2a2b33] text-gray-500 cursor-not-allowed ${sizeClasses[size]}`}
           aria-label="Cannot like your own profile"
           disabled
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={iconSizes[size]}>
             <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
           </svg>
         </button>
         
         {showCount && (
-          <span className="text-brand-700 dark:text-brand-200 font-medium">{likesCount}</span>
+          <span className="text-gray-400 font-medium">{likesCount}</span>
         )}
         
         {showTooltip && (
-          <div className="absolute top-full right-0 mt-2 bg-brand-900 text-white text-xs rounded-md py-2 px-3 whitespace-nowrap z-10 shadow-soft">
+          <div className="absolute top-full mt-2 bg-[#32333c] text-white text-xs rounded-md py-2 px-3 whitespace-nowrap z-10 shadow-lg">
             You cannot like your own profile
-            <div className="absolute -top-1 right-2 w-2 h-2 bg-brand-900 rotate-45"></div>
+            <div className="absolute -top-1 right-2 w-2 h-2 bg-[#32333c] rotate-45"></div>
           </div>
         )}
       </div>
@@ -143,24 +149,24 @@ export default function LikeButton({
       <button
         onClick={handleLikeToggle}
         disabled={isLoading || !isAuthenticated}
-        className={`flex items-center justify-center rounded-full transition-all ${sizeClasses[size]}
+        className={`flex items-center justify-center rounded-md p-1.5 transition-all duration-300 ${sizeClasses[size]}
           ${liked
-            ? 'bg-accent-100 dark:bg-accent-800 text-accent-600 dark:text-accent-400 scale-110 shadow-button hover:bg-accent-200 dark:hover:bg-accent-700'
-            : 'bg-brand-100 dark:bg-brand-800 text-brand-500 dark:text-brand-300 hover:bg-accent-100 dark:hover:bg-accent-700 hover:scale-110'}
+            ? 'bg-pink-500/20 text-pink-400 transform scale-110 hover:bg-pink-500/30'
+            : 'bg-[#2a2b33] text-gray-400 hover:text-pink-400 hover:bg-pink-500/10 hover:scale-110'}
           ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         aria-label={liked ? 'Unlike profile' : 'Like profile'}
       >
         {isLoading ? (
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={`${iconSizes[size]} animate-pulse`}>
             <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
           </svg>
         ) : (
           liked ? (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 transition-all duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={`${iconSizes[size]} transition-all duration-300`}>
               <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 transition-all duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${iconSizes[size]} transition-all duration-300`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </svg>
           )
@@ -168,11 +174,13 @@ export default function LikeButton({
       </button>
       
       {showCount && (
-        <span className="text-brand-700 dark:text-brand-200 font-medium">{likesCount}</span>
+        <span className={`font-medium ${liked ? 'text-pink-400' : 'text-gray-400'}`}>
+          {likesCount}
+        </span>
       )}
       
       {error && (
-        <span className="text-danger-600 text-xs ml-2">{error}</span>
+        <span className="text-red-500 text-xs ml-2">{error}</span>
       )}
     </div>
   );
