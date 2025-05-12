@@ -24,7 +24,7 @@ export default function Navbar() {
               <Link href={`/p/${user.username}`} className="px-4 py-2 rounded-lg text-brand-700 dark:text-brand-100 hover:bg-brand-100 dark:hover:bg-brand-800 transition-colors font-medium">My Profile</Link>
               <button
                 onClick={logout}
-                className="ml-2 px-4 py-2 rounded-lg bg-danger-500 text-white hover:bg-danger-600 transition-colors font-medium shadow-button"
+                className="ml-2 px-4 py-2 rounded-lg bg-danger-500 text-red hover:bg-danger-600 transition-colors font-medium shadow-button"
               >
                 Log Out
               </button>

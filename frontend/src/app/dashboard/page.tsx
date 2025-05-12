@@ -64,7 +64,7 @@ export default function Dashboard() {
             </Link>
             <Link 
               href="/logout"
-              className="text-gray-400 hover:text-white transition"
+              className="text-red-400 hover:text-red-300 transition"
             >
               Log Out
             </Link>
@@ -86,7 +86,7 @@ export default function Dashboard() {
             <div className="space-y-3">
               <Link 
                 href={`/p/${user?.username}`}
-                className="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md text-center transition-colors"
+                className="block w-full bg-white-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-center transition-colors text-base"
               >
                 View My Profile
               </Link>
