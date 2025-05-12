@@ -45,14 +45,34 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
-      'https://personascape.vercel.app'
+      'https://personascape.vercel.app',
+      'https://personascape-git-main-davenpublic.vercel.app', // Vercel preview URLs
+      /\.vercel\.app$/ // Allow all vercel.app subdomains
     ];
+    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
+    
+    // Check if the origin matches any of our allowed origins
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      }
+      if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (!isAllowed) {
       console.warn(`Origin ${origin} not allowed by CORS`);
+      // Instead of blocking with an error, we can allow all origins in development
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
       return callback(new Error('Not allowed by CORS'));
     }
+    
     return callback(null, true);
   },
   credentials: true, // Enable credentials for auth

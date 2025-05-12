@@ -1,0 +1,9 @@
+# Build helper files we don't need in Vercel
+skip-checks.js
+next-env-override.js
+build.bat
+tsconfig.build.json
+
+# Debugging files
+**/*.log
+**/.DS_Store 
