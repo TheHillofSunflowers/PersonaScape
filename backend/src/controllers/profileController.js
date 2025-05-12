@@ -248,10 +248,10 @@ const uploadBackgroundImage = async (req, res, next) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    // Create file URL path
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // Create file URL path - always use HTTPS
+    const host = req.get('host');
     const relativePath = `/uploads/${req.file.filename}`;
-    const fileUrl = `${baseUrl}${relativePath}`;
+    const fileUrl = `https://${host}${relativePath}`;
     
     console.log(`Background image uploaded: ${fileUrl}`);
     
