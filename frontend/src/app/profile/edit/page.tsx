@@ -4,7 +4,7 @@ import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/api';
-import { getImageUrl, getBackgroundImageStyle } from '@/lib/imageUtils';
+import { getBackgroundImageStyle } from '@/lib/imageUtils';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -240,7 +240,7 @@ export default function EditProfilePage() {
         }
         
         // Recursively check nested objects
-        const findImageUrl = (obj: any): string | null => {
+        const findImageUrl = (obj: Record<string, unknown>): string | null => {
           if (!obj || typeof obj !== 'object') return null;
           
           for (const key in obj) {
@@ -257,7 +257,7 @@ export default function EditProfilePage() {
             
             // Recursively check nested objects
             if (value && typeof value === 'object') {
-              const nestedUrl = findImageUrl(value);
+              const nestedUrl = findImageUrl(value as Record<string, unknown>);
               if (nestedUrl) return nestedUrl;
             }
           }
@@ -305,7 +305,7 @@ export default function EditProfilePage() {
           profilePictureUrl = await uploadImage(imageFile);
         } catch (err) {
           console.error('Failed to upload profile picture:', err);
-          setError('Failed to upload profile picture. Profile not saved.');
+          setError('Failed to upload profile picture');
           setIsSaving(false);
           return;
         }

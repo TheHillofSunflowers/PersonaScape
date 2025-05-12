@@ -7,7 +7,7 @@ import LikeButton from "@/components/LikeButton";
 import ViewCount from "@/components/ViewCount";
 import CommentSection from "@/components/CommentSection";
 import { recordProfileView } from "@/lib/views-api";
-import { getImageUrl, getBackgroundImageStyle } from "@/lib/imageUtils";
+import { getBackgroundImageStyle } from "@/lib/imageUtils";
 import Image from "next/image";
 import Link from "next/link";
 
