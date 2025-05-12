@@ -6,6 +6,7 @@ import Link from 'next/link';
 import LikeButton from './LikeButton';
 import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
+import { encodeUsername } from '@/lib/imageUtils';
 
 interface ProfileSummary {
   id: number;
@@ -139,7 +140,7 @@ export default function LikedProfiles({
             </div>
             <div className="flex-1">
               <Link 
-                href={`/p/${profile.username}`}
+                href={`/p/${encodeUsername(profile.username)}`}
                 className="font-medium text-blue-400 hover:text-blue-300 hover:underline"
               >
                 {profile.username}

@@ -5,6 +5,7 @@ import { getLeaderboard } from '@/lib/likes-api';
 import Link from 'next/link';
 import LikeButton from './LikeButton';
 import Image from 'next/image';
+import { encodeUsername } from '@/lib/imageUtils';
 
 interface LeaderboardProfile {
   id: number;
@@ -124,7 +125,7 @@ export default function Leaderboard({
             </div>
             <div className="flex-1 min-w-0">
               <Link 
-                href={`/p/${profile.username}`}
+                href={`/p/${encodeUsername(profile.username)}`}
                 className="font-semibold text-blue-400 hover:text-blue-300 transition-colors text-lg cursor-pointer truncate"
               >
                 {profile.username}

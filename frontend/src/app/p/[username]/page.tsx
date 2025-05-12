@@ -50,13 +50,16 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await api.get<Profile>(`/profile/${username}`);
+        // Ensure the username is properly decoded from the URL
+        const decodedUsername = decodeURIComponent(username);
+        
+        const response = await api.get<Profile>(`/profile/${decodedUsername}`);
         console.log('Profile data received:', response.data);
         setProfile(response.data);
         
         // Record the profile view
         if (response.data.id) {
-          const updatedViewCount = await recordProfileView(username);
+          const updatedViewCount = await recordProfileView(decodedUsername);
           // Update the view count if different from initial fetch
           if (updatedViewCount !== response.data.viewsCount) {
             setProfile(prev => prev ? {...prev, viewsCount: updatedViewCount} : null);

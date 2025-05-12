@@ -58,4 +58,13 @@ export function getImageProps(url: string | null | undefined): {
         crossOrigin: "anonymous"
       } 
     : {};
+}
+
+/**
+ * Safely encodes a username for use in URLs
+ * Preserves spaces and special characters by properly encoding them
+ */
+export function encodeUsername(username: string): string {
+  // Use encodeURIComponent to safely encode all special characters
+  return encodeURIComponent(username);
 } 

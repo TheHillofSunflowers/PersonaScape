@@ -1,4 +1,5 @@
 import api from './api';
+import { encodeUsername } from './imageUtils';
 
 export interface ViewsResponse {
   message: string;
@@ -31,7 +32,7 @@ export interface LeaderboardProfile {
 export async function recordProfileView(username: string): Promise<number> {
   try {
     const response = await api.post<ViewsResponse>(
-      `/views/profile/${username}`
+      `/views/profile/${encodeUsername(username)}`
     );
     return response.data.viewsCount;
   } catch (error) {
@@ -45,7 +46,7 @@ export async function recordProfileView(username: string): Promise<number> {
  */
 export async function getProfileViewStats(username: string): Promise<ViewStats> {
   try {
-    const response = await api.get<ViewStats>(`/views/profile/${username}/stats`);
+    const response = await api.get<ViewStats>(`/views/profile/${encodeUsername(username)}/stats`);
     return response.data;
   } catch (error) {
     console.error('Error getting profile view stats:', error);
