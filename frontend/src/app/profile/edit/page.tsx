@@ -19,6 +19,7 @@ interface ProfileData {
   theme: string;
   customHtml?: string;
   profilePicture?: string | null;
+  backgroundImage?: string | null;
 }
 
 export default function EditProfilePage() {
@@ -31,6 +32,7 @@ export default function EditProfilePage() {
     theme: 'default',
     customHtml: '',
     profilePicture: null,
+    backgroundImage: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -39,6 +41,9 @@ export default function EditProfilePage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [backgroundImageFile, setBackgroundImageFile] = useState<File | null>(null);
+  const [backgroundPreviewUrl, setBackgroundPreviewUrl] = useState<string | null>(null);
+  const [isUploadingBackground, setIsUploadingBackground] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -96,11 +101,15 @@ export default function EditProfilePage() {
               theme: response.data.theme || 'default',
               customHtml: response.data.customHtml || '',
               profilePicture: response.data.profilePicture || null,
+              backgroundImage: response.data.backgroundImage || null,
             });
             
-            // Set the preview URL if there's a profile picture
+            // Set the preview URLs if there are images
             if (response.data.profilePicture) {
               setPreviewUrl(response.data.profilePicture);
+            }
+            if (response.data.backgroundImage) {
+              setBackgroundPreviewUrl(response.data.backgroundImage);
             }
           }
         } catch {
@@ -172,6 +181,49 @@ export default function EditProfilePage() {
     }
   };
 
+  const handleBackgroundImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setBackgroundImageFile(null);
+      setBackgroundPreviewUrl(profile.backgroundImage || null);
+      return;
+    }
+    
+    const file = e.target.files[0];
+    setBackgroundImageFile(file);
+    
+    // Create a preview URL for the image
+    const fileUrl = URL.createObjectURL(file);
+    setBackgroundPreviewUrl(fileUrl);
+  };
+
+  const uploadBackgroundImage = async (file: File): Promise<string> => {
+    setIsUploadingBackground(true);
+    
+    try {
+      // Create form data for the upload
+      const formData = new FormData();
+      formData.append('backgroundImage', file);
+      
+      // Upload to our backend
+      const response = await api.post('/api/profile/upload-background', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      if (response.data && response.data.backgroundImage) {
+        return response.data.backgroundImage;
+      } else {
+        throw new Error('Failed to upload background image');
+      }
+    } catch (error) {
+      console.error('Error uploading background image:', error);
+      throw error;
+    } finally {
+      setIsUploadingBackground(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
@@ -205,11 +257,28 @@ export default function EditProfilePage() {
         }
       }
       
+      // Upload background image if there's a new file
+      let backgroundImageUrl = profile.backgroundImage;
+      
+      if (backgroundImageFile) {
+        try {
+          backgroundImageUrl = await uploadBackgroundImage(backgroundImageFile);
+        } catch (err) {
+          console.error('Failed to upload background image:', err);
+          setError('Failed to upload background image');
+          setIsSaving(false);
+          return;
+        }
+      }
+      
       const profileData = {
         ...profile,
         hobbies: hobbiesArray,
-        socialLinks: socialLinks.length > 0 ? socialLinks : null,
-        profilePicture: profilePictureUrl
+        socialLinks,
+        theme: profile.theme,
+        customHtml: profile.customHtml,
+        profilePicture: profilePictureUrl,
+        backgroundImage: backgroundImageUrl,
       };
       
       console.log('Sending profile update with data:', profileData);
@@ -372,6 +441,56 @@ export default function EditProfilePage() {
               </div>
             </div>
             
+            {/* Background Image */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-white">Background Image</h2>
+              <div className="flex flex-col gap-6">
+                <div className="w-full">
+                  <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-700 border-2 border-gray-600">
+                    {backgroundPreviewUrl ? (
+                      <Image 
+                        src={backgroundPreviewUrl} 
+                        alt="Background preview" 
+                        fill 
+                        style={{ objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-500">
+                        No background image
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label 
+                      htmlFor="backgroundImage" 
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                      Upload a background image
+                    </label>
+                    <input
+                      type="file"
+                      id="backgroundImage"
+                      accept="image/*"
+                      onChange={handleBackgroundImageChange}
+                      className="block w-full text-sm text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-medium
+                        file:bg-blue-600 file:text-white
+                        hover:file:bg-blue-700
+                        file:cursor-pointer cursor-pointer"
+                    />
+                    <p className="mt-1 text-sm text-gray-400">
+                      Recommended: Wide image, at least 1920x1080 pixels
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             {/* Bio */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white">Bio</h2>
@@ -491,13 +610,23 @@ export default function EditProfilePage() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isSaving || isUploading}
+                disabled={isSaving || isUploading || isUploadingBackground}
                 className={`w-full py-3 px-4 rounded-md text-white font-medium transition-colors
-                  ${isSaving || isUploading 
+                  ${isSaving || isUploading || isUploadingBackground 
                     ? 'bg-blue-500/50 cursor-not-allowed' 
                     : 'bg-blue-500 hover:bg-blue-600'}`}
               >
-                {isSaving || isUploading ? 'Saving...' : 'Save Profile'}
+                {isSaving || isUploading || isUploadingBackground ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </span>
+                ) : (
+                  'Save Profile'
+                )}
               </button>
             </div>
           </form>

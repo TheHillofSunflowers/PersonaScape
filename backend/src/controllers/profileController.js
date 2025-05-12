@@ -29,7 +29,8 @@ const getProfile = async (req, res, next) => {
       username: user.username,
       likesCount: user.profile?.likesCount || 0,
       viewsCount: user.profile?.viewsCount || 0,
-      profilePicture: user.profile?.profilePicture || null
+      profilePicture: user.profile?.profilePicture || null,
+      backgroundImage: user.profile?.backgroundImage || null
     };
 
     console.log('Sending profile data:', profileData);
@@ -78,7 +79,8 @@ const getProfile = async (req, res, next) => {
           username: user.username,
           likesCount: 0,
           viewsCount: 0,
-          profilePicture: null
+          profilePicture: null,
+          backgroundImage: null
         };
         
         res.json(profileData);
@@ -97,7 +99,7 @@ const getProfile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
-    let { bio, hobbies, socialLinks, customHtml, theme, profilePicture } = req.body;
+    let { bio, hobbies, socialLinks, customHtml, theme, profilePicture, backgroundImage } = req.body;
 
     console.log('Profile update request received');
     console.log('userId from token:', userId, '(type:', typeof userId, ')');
@@ -115,6 +117,7 @@ const updateProfile = async (req, res, next) => {
     customHtml = customHtml || '';
     theme = theme || 'default';
     profilePicture = profilePicture || null;
+    backgroundImage = backgroundImage || null;
 
     // Convert hobbies to string if it's an array
     if (Array.isArray(hobbies)) {
@@ -136,6 +139,7 @@ const updateProfile = async (req, res, next) => {
     console.log('- customHtml:', customHtml ? 'present' : 'empty', '(type:', typeof customHtml, ')');
     console.log('- theme:', theme, '(type:', typeof theme, ')');
     console.log('- profilePicture:', profilePicture ? 'present' : 'empty', '(type:', typeof profilePicture, ')');
+    console.log('- backgroundImage:', backgroundImage ? 'present' : 'empty', '(type:', typeof backgroundImage, ')');
 
     // Try to get the user first to make sure they exist
     const userExists = await prisma.user.findUnique({
@@ -159,6 +163,7 @@ const updateProfile = async (req, res, next) => {
           customHtml,
           theme,
           profilePicture,
+          backgroundImage,
         },
         create: {
           userId: parseInt(userId),
@@ -168,6 +173,7 @@ const updateProfile = async (req, res, next) => {
           customHtml,
           theme,
           profilePicture,
+          backgroundImage,
           likesCount: 0,
         },
       });
@@ -192,7 +198,7 @@ const updateProfile = async (req, res, next) => {
               socialLinks,
               customHtml,
               theme,
-              // Omit profilePicture and likesCount
+              // Omit new fields that may not exist in the database yet
             },
             create: {
               userId: parseInt(userId),
@@ -201,7 +207,7 @@ const updateProfile = async (req, res, next) => {
               socialLinks,
               customHtml,
               theme,
-              // Omit profilePicture and likesCount
+              // Omit new fields that may not exist in the database yet
             },
           });
           
@@ -210,6 +216,7 @@ const updateProfile = async (req, res, next) => {
             ...profile,
             username: userExists.username,
             profilePicture: null,
+            backgroundImage: null,
             likesCount: 0,
           });
         } catch (fallbackError) {
@@ -226,8 +233,66 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+// POST /profile/upload-background
+const uploadBackgroundImage = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    
+    // Check if user is authenticated
+    if (!userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    // Check if a file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    // Create file URL path
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const relativePath = `/uploads/${req.file.filename}`;
+    const fileUrl = `${baseUrl}${relativePath}`;
+    
+    console.log(`Background image uploaded: ${fileUrl}`);
+    
+    // Update the user's profile with the background image URL
+    const profile = await prisma.profile.upsert({
+      where: { userId: parseInt(userId) },
+      update: {
+        backgroundImage: fileUrl,
+      },
+      create: {
+        userId: parseInt(userId),
+        bio: '',
+        hobbies: '',
+        socialLinks: {},
+        customHtml: '',
+        theme: 'default',
+        backgroundImage: fileUrl,
+        likesCount: 0,
+      },
+    });
+    
+    // Get user info to include username in response
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      select: { username: true }
+    });
+    
+    res.json({
+      ...profile,
+      username: user.username,
+      backgroundImage: fileUrl
+    });
+  } catch (error) {
+    console.error('Error in uploadBackgroundImage:', error);
+    res.status(500).json({ error: 'Failed to upload background image' });
+  }
+};
+
 // Export all controller functions
 module.exports = {
   getProfile,
   updateProfile,
+  uploadBackgroundImage
 }; 

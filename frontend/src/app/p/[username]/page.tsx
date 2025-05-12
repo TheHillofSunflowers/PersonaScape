@@ -27,6 +27,7 @@ interface Profile {
   likesCount: number;
   viewsCount: number;
   profilePicture?: string | null;
+  backgroundImage?: string | null;
 }
 
 export default function ProfilePage() {
@@ -97,7 +98,7 @@ export default function ProfilePage() {
                 Dashboard
               </Link>
               <Link 
-                href="/profile"
+                href="/profile/edit"
                 className="text-gray-400 hover:text-white transition"
               >
                 My Profile
@@ -146,7 +147,7 @@ export default function ProfilePage() {
                 Dashboard
               </Link>
               <Link 
-                href="/profile"
+                href="/profile/edit"
                 className="text-gray-400 hover:text-white transition"
               >
                 My Profile
@@ -177,88 +178,116 @@ export default function ProfilePage() {
   const hasSocialLinks = profile.socialLinks && profile.socialLinks.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#16171d] text-white py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <header className="flex justify-between items-center mb-10">
-          <Link 
-            href="/"
-            className="text-2xl font-semibold text-blue-400 hover:text-blue-300 transition"
-          >
-            PersonaScape
-          </Link>
-          <nav className="flex space-x-6 text-sm">
+    <div className="min-h-screen bg-[#16171d] text-white">
+      {/* Background Image */}
+      {profile.backgroundImage && (
+        <div className="fixed inset-0 z-0">
+          <Image 
+            src={profile.backgroundImage}
+            alt={`${profile.username}'s background`}
+            fill
+            priority
+            style={{ objectFit: 'cover', opacity: 0.3 }}
+            className="backdrop-blur-sm"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-[2px]"></div>
+        </div>
+      )}
+      
+      <div className="relative z-10 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <header className="flex justify-between items-center mb-10">
             <Link 
-              href="/leaderboard"
-              className="text-gray-400 hover:text-white transition"
+              href="/"
+              className="text-2xl font-semibold text-blue-400 hover:text-blue-300 transition"
             >
-              Leaderboard
+              PersonaScape
             </Link>
-            <Link 
-              href="/dashboard"
-              className="text-gray-400 hover:text-white transition"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              href="/profile"
-              className="text-gray-400 hover:text-white transition"
-            >
-              My Profile
-            </Link>
-            <Link 
-              href="/logout"
-              className="text-gray-400 hover:text-white transition"
-            >
-              Log Out
-            </Link>
-          </nav>
-        </header>
-        
-        <div className="bg-[#23242b] rounded-xl p-8 border border-[#32333c] shadow-lg mb-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
-            <div className="flex items-center">
-              <div className="w-24 h-24 rounded-lg overflow-hidden bg-[#2a2b33] mr-6 flex-shrink-0 border border-[#32333c]">
-                {profile.profilePicture ? (
-                  <Image 
-                    src={profile.profilePicture} 
-                    alt={`${profile.username}'s profile picture`}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#3a3b44] text-blue-300 font-bold text-3xl">
-                    {profile.username.charAt(0).toUpperCase()}
+            <nav className="flex space-x-6 text-sm">
+              <Link 
+                href="/leaderboard"
+                className="text-gray-400 hover:text-white transition"
+              >
+                Leaderboard
+              </Link>
+              <Link 
+                href="/dashboard"
+                className="text-gray-400 hover:text-white transition"
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/profile/edit"
+                className="text-gray-400 hover:text-white transition"
+              >
+                My Profile
+              </Link>
+              <Link 
+                href="/logout"
+                className="text-gray-400 hover:text-white transition"
+              >
+                Log Out
+              </Link>
+            </nav>
+          </header>
+
+          <div className={`rounded-xl p-8 shadow-lg backdrop-blur-sm ${profile.backgroundImage ? 'bg-[#23242b]/80 border border-[#32333c]/70' : 'bg-[#23242b] border border-[#32333c]'}`}>
+            <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-6">
+              <div className="flex items-center">
+                <div className="w-24 h-24 rounded-lg overflow-hidden bg-[#2a2b33] mr-6 flex-shrink-0 border border-[#32333c]">
+                  {profile.profilePicture ? (
+                    <Image
+                      src={profile.profilePicture}
+                      alt={`${profile.username}'s profile picture`}
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-[#3a3b44] text-blue-300 font-bold text-3xl">
+                      {profile.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white mb-1">
+                    {profile.username}
+                  </h1>
+                  <div className="flex items-center text-gray-400 text-sm">
+                    <ViewCount count={profile.viewsCount} />
                   </div>
-                )}
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-white">{profile.username}</h1>
-                <div className="flex items-center mt-2">
-                  <ViewCount count={profile.viewsCount || 0} size="md" className="text-blue-400" />
                 </div>
               </div>
-            </div>
-            <LikeButton 
-              profileId={profile.id} 
-              initialLikesCount={profile.likesCount || 0}
-              size="lg"
-              username={profile.username}
-              className="text-pink-400"
-            />
-          </div>
-          
-          <div className="space-y-6">
-            <div>
-              <p className="text-gray-300 leading-relaxed">{profile.bio}</p>
+              
+              <LikeButton 
+                profileId={profile.id} 
+                initialLikesCount={profile.likesCount || 0}
+                size="lg"
+                username={profile.username}
+                className="text-pink-400"
+              />
             </div>
             
+            {/* Bio */}
+            {profile.bio && (
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-white">About</h2>
+                <div className="p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]">
+                  <p className="text-gray-300 whitespace-pre-wrap">{profile.bio}</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Hobbies */}
             {hobbiesArray.length > 0 && (
-              <div>
-                <h2 className="text-xl font-semibold mb-3 text-white">Hobbies</h2>
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-white">Interests</h2>
                 <div className="flex flex-wrap gap-2">
                   {hobbiesArray.map((hobby, index) => (
-                    <span key={index} className="bg-[#2a2b33] px-3 py-1 rounded-md text-sm text-blue-300 border border-[#32333c]">
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-[#2a2b33] rounded-full text-sm text-blue-300 border border-blue-800/30"
+                    >
                       {hobby}
                     </span>
                   ))}
@@ -266,17 +295,18 @@ export default function ProfilePage() {
               </div>
             )}
             
+            {/* Social Links */}
             {hasSocialLinks && (
-              <div>
-                <h2 className="text-xl font-semibold mb-3 text-white">Social Links</h2>
-                <div className="flex gap-4 flex-wrap">
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-white">Connect</h2>
+                <div className="flex flex-wrap gap-3">
                   {profile.socialLinks?.map((link, index) => (
-                    <a 
+                    <a
                       key={index}
-                      href={link.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-400 hover:text-blue-300 transition bg-[#2a2b33] px-4 py-2 rounded-md border border-[#32333c]"
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-[#2a2b33] rounded-lg text-sm text-blue-300 border border-[#32333c] hover:bg-[#32333d] transition-colors"
                     >
                       {link.platform}
                     </a>
@@ -284,20 +314,23 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
-
+            
+            {/* Custom HTML */}
             {profile.customHtml && (
-              <div 
-                className="mt-6 p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]"
-                dangerouslySetInnerHTML={{ __html: profile.customHtml }}
-              />
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-white">Custom Content</h2>
+                <div className="p-4 bg-[#2a2b33] rounded-lg border border-[#32333c]">
+                  <div dangerouslySetInnerHTML={{ __html: profile.customHtml }} />
+                </div>
+              </div>
             )}
+            
+            {/* Comments */}
+            <div className="mt-12">
+              <h2 className="text-xl font-semibold mb-6 text-white">Comments</h2>
+              <CommentSection profileId={profile.id} />
+            </div>
           </div>
-        </div>
-        
-        {/* Add the Comment Section */}
-        <div className="bg-[#23242b] rounded-xl p-8 border border-[#32333c] shadow-lg">
-          <h2 className="text-xl font-semibold mb-6 text-white">Comments</h2>
-          <CommentSection profileId={profile.id} />
         </div>
       </div>
     </div>

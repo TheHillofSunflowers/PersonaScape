@@ -33,6 +33,7 @@ model Profile {
   customHtml   String?
   theme        String? // light/dark/custom
   profilePicture String? // URL to the profile picture
+  backgroundImage String? // URL to the background image
   User         User    @relation(fields: [userId], references: [id])
   receivedLikes ProfileLike[]
   likesCount    Int    @default(0)
