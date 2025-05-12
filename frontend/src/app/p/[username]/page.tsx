@@ -186,6 +186,7 @@ export default function ProfilePage() {
           <div 
             className="absolute inset-0 bg-center bg-cover opacity-30"
             style={getBackgroundImageStyle(profile.backgroundImage)}
+            data-crossorigin="anonymous"
           />
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         </div>
@@ -239,6 +240,7 @@ export default function ProfilePage() {
                       width={96}
                       height={96}
                       className="w-full h-full object-cover"
+                      crossOrigin="anonymous"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-[#3a3b44] text-blue-300 font-bold text-3xl">

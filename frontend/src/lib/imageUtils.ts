@@ -31,7 +31,28 @@ export function getImageUrl(url: string | null | undefined): string {
 /**
  * Creates a CSS background-image value from a URL
  */
-export function getBackgroundImageStyle(url: string | null | undefined): { backgroundImage?: string } {
+export function getBackgroundImageStyle(url: string | null | undefined): { backgroundImage?: string, crossOrigin?: string } {
   const safeUrl = getImageUrl(url);
-  return safeUrl ? { backgroundImage: `url('${safeUrl}')` } : {};
+  return safeUrl 
+    ? { 
+        backgroundImage: `url('${safeUrl}')`,
+        crossOrigin: 'anonymous' 
+      } 
+    : {};
+}
+
+/**
+ * Gets image props for Next.js Image component
+ */
+export function getImageProps(url: string | null | undefined): {
+  src: string;
+  crossOrigin: "anonymous";
+} | Record<string, never> {
+  const safeUrl = getImageUrl(url);
+  return safeUrl 
+    ? { 
+        src: safeUrl,
+        crossOrigin: "anonymous"
+      } 
+    : {};
 } 

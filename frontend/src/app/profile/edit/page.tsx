@@ -469,6 +469,7 @@ export default function EditProfilePage() {
                       width={128} 
                       height={128} 
                       className="w-full h-full object-cover"
+                      crossOrigin="anonymous"
                     />
                   ) : (
                     <span className="text-gray-400 text-5xl">
@@ -505,6 +506,7 @@ export default function EditProfilePage() {
                       <div 
                         className="absolute inset-0 bg-center bg-cover"
                         style={getBackgroundImageStyle(backgroundPreviewUrl)}
+                        data-crossorigin="anonymous"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">

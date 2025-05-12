@@ -93,9 +93,28 @@ app.use(cors(corsOptions));
 // Parse JSON request body
 app.use(express.json());
 
+// Special CORS handling for static files in uploads directory
+app.use('/uploads', (req, res, next) => {
+  // Setting specific CORS headers for the static image files
+  res.header('Access-Control-Allow-Origin', '*'); // Allow any origin to access images
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  next();
+});
+
 // Serve static files from the public directory
 const publicPath = path.join(__dirname, '../public');
-app.use(express.static(publicPath));
+app.use(express.static(publicPath, {
+  setHeaders: (res, path) => {
+    // Set permissive CORS headers for all static files, especially images
+    if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif')) {
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+  }
+}));
 
 // Root route
 app.get('/', (_req, res) => {
@@ -158,6 +177,49 @@ app.get('/api/network-info', (req, res) => {
       host: HOST,
       corsOptions: corsOptions
     }
+  });
+});
+
+// Debug route for checking background image accessibility
+app.get('/api/debug-image-access', (req, res) => {
+  const fs = require('fs');
+  const uploadDir = path.join(__dirname, '../public/uploads');
+  
+  // List all images in the uploads directory
+  fs.readdir(uploadDir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ 
+        error: 'Failed to read uploads directory',
+        message: err.message
+      });
+    }
+    
+    // Filter only image files
+    const imageFiles = files.filter(file => 
+      file.endsWith('.png') || 
+      file.endsWith('.jpg') || 
+      file.endsWith('.jpeg') || 
+      file.endsWith('.gif')
+    );
+    
+    // Create URLs for each image
+    const imageUrls = imageFiles.map(file => {
+      const relativePath = `/uploads/${file}`;
+      return {
+        filename: file,
+        url: `https://${req.get('host')}${relativePath}`,
+        path: relativePath
+      };
+    });
+    
+    res.json({
+      message: 'Image access debug info',
+      totalImages: imageFiles.length,
+      images: imageUrls,
+      uploadsDirectory: uploadDir,
+      host: req.get('host'),
+      protocol: req.protocol
+    });
   });
 });
 
